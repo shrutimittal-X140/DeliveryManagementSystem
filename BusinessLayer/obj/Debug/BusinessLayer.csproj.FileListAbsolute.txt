@@ -1,0 +1,9 @@
+C:\Users\Shruti Mittal\source\repos\DeliveryManagementSystem\BusinessLayer\bin\Debug\BusinessLayer.dll
+C:\Users\Shruti Mittal\source\repos\DeliveryManagementSystem\BusinessLayer\bin\Debug\BusinessLayer.pdb
+C:\Users\Shruti Mittal\source\repos\DeliveryManagementSystem\BusinessLayer\bin\Debug\DataAccessLayer.dll
+C:\Users\Shruti Mittal\source\repos\DeliveryManagementSystem\BusinessLayer\bin\Debug\DataAccessLayer.pdb
+C:\Users\Shruti Mittal\source\repos\DeliveryManagementSystem\BusinessLayer\obj\Debug\BusinessLayer.csproj.AssemblyReference.cache
+C:\Users\Shruti Mittal\source\repos\DeliveryManagementSystem\BusinessLayer\obj\Debug\BusinessLayer.csproj.CoreCompileInputs.cache
+C:\Users\Shruti Mittal\source\repos\DeliveryManagementSystem\BusinessLayer\obj\Debug\BusinessLayer.csproj.CopyComplete
+C:\Users\Shruti Mittal\source\repos\DeliveryManagementSystem\BusinessLayer\obj\Debug\BusinessLayer.dll
+C:\Users\Shruti Mittal\source\repos\DeliveryManagementSystem\BusinessLayer\obj\Debug\BusinessLayer.pdb
