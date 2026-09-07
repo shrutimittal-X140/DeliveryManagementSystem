@@ -158,32 +158,32 @@
                 <p class="register-subtitle">Sign up to access the delivery management system</p>
 
                 <!-- Status Feedback Message -->
-                <asp:Label ID="lblMessage" runat="server" CssClass="d-block mb-3 text-start small fw-bold"></asp:Label>
+                <span id="lblMessage" class="d-block mb-3 text-start small fw-bold"></span>
 
-                <div class="text-start mb-3">
-                    <label class="form-label-custom">Full Name</label>
-                    <asp:TextBox ID="txtFullName" runat="server" CssClass="form-control-custom" placeholder="e.g. John Doe" Required="true"></asp:TextBox>
-                </div>
+<div class="text-start mb-3">
+    <label class="form-label-custom">Full Name</label>
+    <asp:TextBox ID="txtFullName" runat="server" ClientIDMode="Static" CssClass="form-control-custom" placeholder="e.g. John Doe"></asp:TextBox>
+</div>
 
-                <div class="text-start mb-3">
-                    <label class="form-label-custom">Username</label>
-                    <asp:TextBox ID="txtUsername" runat="server" CssClass="form-control-custom" placeholder="Choose a username" Required="true"></asp:TextBox>
-                </div>
+<div class="text-start mb-3">
+    <label class="form-label-custom">Username</label>
+    <asp:TextBox ID="txtUsername" runat="server" ClientIDMode="Static" CssClass="form-control-custom" placeholder="Choose a username"></asp:TextBox>
+</div>
 
-                <div class="text-start mb-3">
-                    <label class="form-label-custom">Password</label>
-                    <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" CssClass="form-control-custom" placeholder="Enter password" Required="true"></asp:TextBox>
-                </div>
+<div class="text-start mb-3">
+    <label class="form-label-custom">Password</label>
+    <asp:TextBox ID="txtPassword" runat="server" ClientIDMode="Static" TextMode="Password" CssClass="form-control-custom" placeholder="Enter password"></asp:TextBox>
+</div>
 
-                <div class="text-start mb-4">
-                    <label class="form-label-custom">Account Role</label>
-                    <asp:DropDownList ID="ddlRole" runat="server" CssClass="form-select">
-    <asp:ListItem Value="1">Admin</asp:ListItem>
-    <asp:ListItem Value="2">Super Admin</asp:ListItem>
-</asp:DropDownList>
-                </div>
+<div class="text-start mb-4">
+    <label class="form-label-custom">Account Role</label>
+    <asp:DropDownList ID="ddlRole" runat="server" ClientIDMode="Static" CssClass="form-select">
+        <asp:ListItem Value="1">Admin</asp:ListItem>
+        <asp:ListItem Value="2">Super Admin</asp:ListItem>
+    </asp:DropDownList>
+</div>
 
-                <asp:Button ID="btnRegister" runat="server" Text="Register Account" CssClass="btn-neon-block" OnClick="btnRegister_Click" />
+<button type="button" id="btnRegister" class="btn-neon-block">Register Account</button>
 
                 <div class="register-footer-text text-center">
                     Already have an account? <a href="Login.aspx">Sign In</a>
@@ -191,5 +191,7 @@
             </div>
         </div>
     </form>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="Scripts/auth.js"></script>
 </body>
 </html>

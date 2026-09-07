@@ -12,12 +12,11 @@ namespace WebUI
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             GlobalConfiguration.Configure(WebApiConfig.Register);
         }
-
         protected void Application_PostAuthorizeRequest()
         {
-            if (IsWebApiRequest())
+            if (System.Web.HttpContext.Current != null)
             {
-                HttpContext.Current.SetSessionStateBehavior(System.Web.SessionState.SessionStateBehavior.Required);
+                System.Web.HttpContext.Current.SetSessionStateBehavior(System.Web.SessionState.SessionStateBehavior.Required);
             }
         }
 

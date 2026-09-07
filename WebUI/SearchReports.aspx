@@ -1,159 +1,238 @@
-﻿<%@ Page Title="Search & Reports" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="SearchReports.aspx.cs" Inherits="WebUI.SearchReports" EnableEventValidation="false" %>
+﻿<%@ Page Title="Search & Reports" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="SearchReports.aspx.cs" Inherits="WebUI.SearchReports" %>
 
-<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
-    <style>
-        body, html {
-            background-color: #0b0f19 !important;
-            color: #ffffff !important;
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+
+       <style>
+        .reports-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 120px); 
         }
 
-        .page-header-title {
-            color: #ffffff !important;
-            font-weight: 700 !important;
+        .reports-toolbar {
+            background-color: #1a1d23;
+            border: 1px solid #343a40;
+            border-radius: 0.5rem;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1rem;
         }
 
-        .card-custom, .card-metric, .card {
-            background-color: #111827 !important;
-            border: 1px solid #1f2937 !important;
-            border-radius: 10px !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
-            padding: 1rem !important;
+        .reports-toolbar .form-control,
+        .reports-toolbar .form-select {
+            height: 40px;
+            width: auto;
         }
 
-        table.custom-table,
-        table.custom-table th,
-        table.custom-table td,
-        table.custom-table tr,
-        table.custom-table td * {
-            color: #ffffff !important;
-            background-color: #111827 !important;
+        .reports-toolbar .input-icon-wrap {
+            position: relative;
+            flex: 0 1 280px;
         }
 
-        table.custom-table th {
-            background-color: #1f2937 !important;
-            color: #ffffff !important;
-            font-weight: 600 !important;
-            border-bottom: 1px solid #374151 !important;
-            padding: 12px 16px !important;
+        .reports-toolbar .input-icon-wrap input {
+            width: 100%;
+            padding-left: 34px;
         }
 
-        table.custom-table td {
-            border-bottom: 1px solid #1f2937 !important;
-            padding: 12px 16px !important;
+        .reports-toolbar .input-icon-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            pointer-events: none;
         }
 
-        .form-control-custom, .form-select-custom {
-            background-color: #1f2937 !important;
-            border: 1px solid #374151 !important;
-            color: #ffffff !important;
+        .reports-toolbar d-flex justify-content-between align-items-center flex-wrap gap-2{
+            padding-top: 50px;
+            height:150px;
+        }
+        .reports-toolbar .filter-select-wrap {
+            position: relative;
+            flex: 0 0 200px;
         }
 
-        .form-control-custom:focus, .form-select-custom:focus {
-            background-color: #1f2937 !important;
-            border-color: #10b981 !important;
-            color: #ffffff !important;
+        .reports-toolbar .filter-select-wrap select {
+            width: 100%;
+            padding-left: 34px;
         }
 
-        .btn-theme-green {
-            background-color: #10b981 !important;
-            border-color: #10b981 !important;
-            color: #ffffff !important;
+        .reports-toolbar .filter-select-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            pointer-events: none;
+            z-index: 2;
         }
 
-        .btn-theme-green:hover {
-            background-color: #059669 !important;
-            border-color: #059669 !important;
+        .reports-table-container {
+            margin-top: auto;
         }
 
-        .text-theme-green {
-            color: #10b981 !important;
+        .reports-table-container table {
+            margin-bottom: 0;
         }
 
-        .badge-pending { background-color: #f59e0b !important; color: #ffffff !important; }
-        .badge-intransit { background-color: #3b82f6 !important; color: #ffffff !important; }
-        .badge-delivered { background-color: #10b981 !important; color: #ffffff !important; }
-        .badge-cancelled { background-color: #ef4444 !important; color: #ffffff !important; }
+        .reports-table-container thead th {
+            border-bottom: 1px solid #343a40;
+            letter-spacing: 0.03em;
+        }
     </style>
-</asp:Content>
 
-<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
-    <asp:ScriptManager ID="ScriptManager1" runat="server" />
+    <div class="container-fluid px-4 py-3 reports-wrapper">
 
-    <div class="container-fluid px-4 py-3">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h3 class="page-header-title mb-1">
-                    <i class="fa-solid fa-magnifying-glass me-2 text-theme-green"></i>Search & Analytics
-                </h3>
-                <p class="text-muted small mb-0">Search historical delivery logs and generate system analytics.</p>
+        <asp:Label ID="lblMessage" runat="server" Visible="false" class="d-block mb-3"></asp:Label>
+
+        <div class="reports-toolbar d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+                <div class="filter-select-wrap">
+                    <i class="bi bi-"></i>
+                    <asp:TextBox ID="txtKeywords" runat="server" CssClass="form-control bg-dark text-white border-secondary"></asp:TextBox>
+                </div>
+                <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-select bg-dark text-white border-secondary">
+                    <asp:ListItem Value="">All Statuses</asp:ListItem>  
+                    <asp:ListItem Value="Pending">Pending</asp:ListItem>
+                    <asp:ListItem Value="In Transit">In Transit</asp:ListItem>
+                    <asp:ListItem Value="Delivered">Delivered</asp:ListItem>
+                    <asp:ListItem Value="Failed">Failed</asp:ListItem>
+                </asp:DropDownList>
+                <asp:Button ID="btnApplyFilterServer" runat="server" Text="Search" CssClass="btn btn-success fw-bold px-4" OnClick="btnApplyFilterServer_Click" />
             </div>
             <div>
-                <asp:Button ID="btnExport" runat="server" Text="Export to CSV" CssClass="btn btn-outline-success fw-bold px-3 py-2" OnClick="btnExport_Click" />
+                <asp:Button ID="btnExport" runat="server" Text="Export CSV" CssClass="btn btn-outline-light" OnClick="btnExport_Click" />
             </div>
         </div>
 
-        <asp:UpdatePanel ID="upSearchResults" runat="server" UpdateMode="Conditional">
-            <ContentTemplate>
-        
-                <asp:Panel ID="pnlFilter" runat="server" DefaultButton="btnApplyFilter" CssClass="card card-metric p-4 mb-4 shadow-sm">
-                    <div class="row g-3">
-                        <div class="col-md-5">
-                            <label class="form-label fw-semibold text-light">Search Keywords</label>
-                            <asp:TextBox ID="txtKeywords" runat="server" CssClass="form-control form-control-custom" 
-                                Placeholder="Order ID, Customer, Driver..." AutoPostBack="false"></asp:TextBox>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold text-light">Status Filter</label>
-                            <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-select form-select-custom">
-                                <asp:ListItem Value="" Text="All Statuses" Selected="True"></asp:ListItem>
-                                <asp:ListItem Value="Pending" Text="Pending"></asp:ListItem>
-                                <asp:ListItem Value="In Transit" Text="In Transit"></asp:ListItem>
-                                <asp:ListItem Value="Delivered" Text="Delivered"></asp:ListItem>
-                                <asp:ListItem Value="Cancelled" Text="Cancelled"></asp:ListItem>
-                            </asp:DropDownList>
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <asp:Button ID="btnApplyFilter" runat="server" Text="Apply Filter" 
-                                CssClass="btn btn-theme-green w-100 fw-bold" OnClick="btnApplyFilter_Click" />
-                        </div>
-                    </div>
-                </asp:Panel>
+        <div class="reports-table-container table-responsive rounded-3 border border-secondary">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead>
+                    <tr class="text-uppercase small text-muted">
+                        <th>Order ID</th>
+                        <th>Customer Name</th>
+                        <th>Driver Name</th>
+                        <th>Delivery Address</th>
+                        <th>Created Date</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <asp:Repeater ID="rptReportsTable" runat="server">
+                        <ItemTemplate>
+                            <tr>
+                                <td class="fw-semibold text-white"><%# Eval("OrderId") %></td>
+                                <td><%# Eval("CustomerName") == DBNull.Value ? "N/A" : Eval("CustomerName") %></td>
+                                <td><%# Eval("DriverName") == DBNull.Value ? "N/A" : Eval("DriverName") %></td>
+                                <td><%# Eval("DeliveryAddress") == DBNull.Value ? "N/A" : Eval("DeliveryAddress") %></td>
+                                <td><%# Eval("CreatedDate", "{0:yyyy-MM-dd HH:mm}") %></td>
+                                <td>
+                <span class='badge px-2 py-1 rounded-2 <%# GetStatusBadgeClass(Convert.ToString(Eval("CurrentStatus"))) %>'>
+                    <%# Eval("CurrentStatus") %>
+                </span>
+                                </td>
+                                <td class="text-end">
+                                 <button type="button" class="btn btn-sm btn-outline-success me-1" 
+        onclick='openEditReportModal(
+            <%# Eval("OrderId") %>, 
+            <%# Eval("CustomerId") == DBNull.Value ? 0 : Eval("CustomerId") %>, 
+            <%# Eval("DriverId") == DBNull.Value ? 0 : Eval("DriverId") %>, 
+            <%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("CustomerName")), true) %>, 
+            <%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("DriverName")), true) %>, 
+            <%# HttpUtility.JavaScriptStringEncode(Convert.ToString(Eval("DeliveryAddress")), true) %>)'>
+    Edit
+</button>
+                                </td>
+                            </tr>
+                        </ItemTemplate>
+                    </asp:Repeater>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-                <div class="card card-custom shadow-lg">
-                    <div class="table-responsive">
-                        <asp:GridView ID="gvSearchResults" runat="server" AutoGenerateColumns="False"
-                            CssClass="table custom-table align-middle" DataKeyNames="OrderId"
-                            AllowPaging="True" PageSize="10"
-                            OnPageIndexChanging="gvSearchResults_PageIndexChanging">
-                            <Columns>
-                                <asp:BoundField DataField="OrderId" HeaderText="Order ID" />
-                                <asp:BoundField DataField="CustomerName" HeaderText="Customer Name" />
-                                <asp:BoundField DataField="DriverName" HeaderText="Driver Name" />
-                                <asp:BoundField DataField="DeliveryAddress" HeaderText="Address" />
-                                <asp:BoundField DataField="CreatedDate" HeaderText="Date Created" DataFormatString="{0:yyyy-MM-dd HH:mm}" />
-                                
-                                <asp:TemplateField HeaderText="Status">
-                                    <ItemTemplate>
-                                        <span class='badge <%# GetStatusBadgeCss(Convert.ToString(Eval("CurrentStatus"))) %>'>
-                                            <%# Eval("CurrentStatus") %>
-                                        </span>
-                                    </ItemTemplate>
-                                </asp:TemplateField>
-                            </Columns>
-                            <EmptyDataTemplate>
-                                <div class="p-4 text-center text-muted fs-6">No historical records match your search criteria.</div>
-                            </EmptyDataTemplate>
-                        </asp:GridView>
+    <!-- Edit Record Modal -->
+    <div class="modal fade" id="editReportModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Edit Report Record</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="modalOrderId" />
+                    <input type="hidden" id="modalCustomerId" />
+                    <input type="hidden" id="modalDriverId" />
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" id="modalCustomerName" class="form-control bg-dark text-white border-secondary" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Driver Name</label>
+                        <input type="text" id="modalDriverName" class="form-control bg-dark text-white border-secondary" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Delivery Address</label>
+                        <input type="text" id="modalAddress" class="form-control bg-dark text-white border-secondary" />
                     </div>
                 </div>
-            </ContentTemplate>
-            <Triggers>
-                <asp:AsyncPostBackTrigger ControlID="btnApplyFilter" EventName="Click" />
-            </Triggers>
-        </asp:UpdatePanel>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" onclick="saveReportUpdate()">Save Changes</button>
+                </div>
+            </div>
+        </div>
     </div>
-</asp:Content>
 
-<asp:Content ID="Content3" ContentPlaceHolderID="ScriptContent" runat="server">
+    <script>
+        function openEditReportModal(orderId, customerId, driverId, custName, driverName, address) {
+            document.getElementById('modalOrderId').value = orderId || 0;
+            document.getElementById('modalCustomerId').value = customerId || 0;
+            document.getElementById('modalDriverId').value = driverId || 0;
+            document.getElementById('modalCustomerName').value = (custName === 'N/A' || !custName) ? '' : custName;
+            document.getElementById('modalDriverName').value = (driverName === 'N/A' || !driverName) ? '' : driverName;
+            document.getElementById('modalAddress').value = (address === 'N/A' || !address) ? '' : address;
+
+            var modalElement = document.getElementById('editReportModal');
+            var modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modal.show();
+        }
+
+        function saveReportUpdate() {
+            var payload = JSON.stringify({
+                orderId: parseInt(document.getElementById('modalOrderId').value) || 0,
+                customerId: parseInt(document.getElementById('modalCustomerId').value) || 0,
+                driverId: parseInt(document.getElementById('modalDriverId').value) || 0,
+                customerName: $.trim($('#modalCustomerName').val()),
+                driverName: $.trim($('#modalDriverName').val()),
+                address: $.trim($('#modalAddress').val())
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "WebServices/ReportService.asmx/UpdateRecord",
+                data: JSON.stringify(payload),
+                contentType: "application/json ; charset = utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.hasOwnProperty('d') ? response.d : response;
+                    if (data.success) {
+                        alert('record updated successfully');
+                        location.reload();
+                    } else {
+                        alert('server Response:' + data.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    var errDetail = "HTTP" + xhr.status + " - " + error;
+                    if (xhr.responseJSON && xhr.responseJSON.Message) {
+                        errDetail += "\nDetails: " + xhr.responseJSON.Message;
+                    } else if (xhr.responseText) {
+                        errorDetail += "\nRaw Error: " + xhr.responseText.substring(0, 300);
+                    }
+                    alert("Error: " + errDetail);
+                }
+            });
+        }                
+    </script>
 </asp:Content>

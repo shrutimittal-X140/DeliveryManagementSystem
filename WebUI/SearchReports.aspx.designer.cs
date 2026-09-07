@@ -15,40 +15,13 @@ namespace WebUI
     {
 
         /// <summary>
-        /// ScriptManager1 control.
+        /// lblMessage control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.ScriptManager ScriptManager1;
-
-        /// <summary>
-        /// btnExport control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnExport;
-
-        /// <summary>
-        /// upSearchResults control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel upSearchResults;
-
-        /// <summary>
-        /// pnlFilter control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlFilter;
+        protected global::System.Web.UI.WebControls.Label lblMessage;
 
         /// <summary>
         /// txtKeywords control.
@@ -69,21 +42,30 @@ namespace WebUI
         protected global::System.Web.UI.WebControls.DropDownList ddlStatus;
 
         /// <summary>
-        /// btnApplyFilter control.
+        /// btnApplyFilterServer control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnApplyFilter;
+        protected global::System.Web.UI.WebControls.Button btnApplyFilterServer;
 
         /// <summary>
-        /// gvSearchResults control.
+        /// btnExport control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvSearchResults;
+        protected global::System.Web.UI.WebControls.Button btnExport;
+
+        /// <summary>
+        /// rptReportsTable control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptReportsTable;
     }
 }

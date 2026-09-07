@@ -128,28 +128,27 @@
             <p class="login-subtitle">Sign in to your account</p>
 
             <!-- Error Message Alert -->
-            <asp:Panel ID="pnlError" runat="server" Visible="false" CssClass="alert alert-danger py-2 px-3 small rounded-3 mb-3 text-start" role="alert">
+           <div id="pnlError" class="alert alert-danger py-2 px-3 small rounded-3 mb-3 text-start" style="display:none;" role="alert">
                 <i class="fa-solid fa-circle-exclamation me-1"></i>
-                <asp:Label ID="lblMessage" runat="server"></asp:Label>
-            </asp:Panel>
+                <span id="lblMessage"></span>
+           </div>
 
-            <div class="text-start mb-3">
+           <div class="text-start mb-3">
                 <label class="form-label-custom">Username</label>
-                <asp:TextBox ID="txtUsername" runat="server" CssClass="form-control-custom" placeholder="Enter your username"></asp:TextBox>
-            </div>
+                <asp:TextBox ID="txtUsername" runat="server" ClientIDMode="Static" CssClass="form-control-custom" placeholder="Enter your username"></asp:TextBox>
+           </div>
 
-            <div class="text-start mb-4">
+           <div class="text-start mb-4">
                 <label class="form-label-custom">Password</label>
-                <asp:TextBox ID="txtPassword" runat="server" TextMode="Password" CssClass="form-control-custom" placeholder="Enter your password"></asp:TextBox>
-            </div>
+    <asp:TextBox ID="txtPassword" runat="server" ClientIDMode="Static" TextMode="Password" CssClass="form-control-custom" placeholder="Enter your password"></asp:TextBox>
+</div>
 
-            <!-- Sign In Button using your custom green neon class -->
-            <asp:Button ID="btnLogin" runat="server" Text="Sign In" CssClass="btn-neon-block" OnClick="btnLogin_Click" UseSubmitBehavior="true" />
-
+<button type="button" id="btnLogin" class="btn-neon-block">Sign In</button>
             <!-- Direct link to Register Page for new accounts -->
             <div class="login-footer-text text-center">
                 Don't have an account? <a href="Register.aspx">Create One</a>
             </div>
         </div>
     </div>
+    <script src="Scripts/auth.js"></script>
 </asp:Content>

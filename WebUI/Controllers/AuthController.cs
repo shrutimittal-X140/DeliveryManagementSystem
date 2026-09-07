@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using BusinessLayer;
@@ -36,13 +37,14 @@ namespace WebUI.Controllers
 
             if (dt != null && dt.Rows.Count > 0)
             {
-                // Store in ASP.NET Session safely
+
                 if (HttpContext.Current != null && HttpContext.Current.Session != null)
                 {
                     HttpContext.Current.Session["UserId"] = dt.Rows[0]["UserId"];
                     HttpContext.Current.Session["Username"] = dt.Rows[0]["Username"];
                     HttpContext.Current.Session["FullName"] = dt.Rows[0]["FullName"];
-                    HttpContext.Current.Session["UserRole"] = dt.Rows[0]["RoleName"];
+                    HttpContext.Current.Session["Role"] = dt.Rows[0]["RoleName"];
+                    HttpContext.Current.Session["RoleId"] = dt.Rows[0]["RoleId"];
                 }
 
                 return Ok(new { success = true, redirect = "Dashboard.aspx" });

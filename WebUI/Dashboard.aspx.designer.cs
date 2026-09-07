@@ -33,15 +33,6 @@ namespace WebUI
         protected global::System.Web.UI.WebControls.Label lblAccessDeniedMsg;
 
         /// <summary>
-        /// btnRefresh control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton btnRefresh;
-
-        /// <summary>
         /// divDrivers control.
         /// </summary>
         /// <remarks>
@@ -130,14 +121,5 @@ namespace WebUI
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblFailedDeliveries;
-
-        /// <summary>
-        /// gvRecentDeliveries control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvRecentDeliveries;
     }
 }

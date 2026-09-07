@@ -1,8 +1,8 @@
 ﻿<%@ Page Title="Customer Management" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="CustomerManagement.aspx.cs" Inherits="WebUI.CustomerManagement" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
+    <link href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css" rel="stylesheet">
     <style>
-        /* Force Dark Background & Smooth Global Typography */
         body, html {
             background-color: #0b0f19 !important;
             color: #e2e8f0 !important;
@@ -23,7 +23,6 @@
             color: #94a3b8 !important;
         }
 
-        /* --- MAIN CONTAINER CARD (Glassmorphism + Dark Glow) --- */
         .card-custom {
             background-color: #111827 !important;
             border-radius: 12px !important;
@@ -32,25 +31,30 @@
             overflow: hidden !important;
         }
 
-        /* --- TABLE STYLING --- */
+        .table-responsive-custom {
+            width: 100% !important;
+            overflow-x: auto !important;
+            background-color: #111827 !important;
+        }
+
         .custom-table {
             color: #e2e8f0 !important;
             margin-bottom: 0 !important;
-            width: 100%;
+            width: 100% !important;
             background-color: #111827 !important;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse !important;
         }
 
         .custom-table th {
             background-color: #1a2332 !important;
             color: #94a3b8 !important;
             font-weight: 600 !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.08) !important;
             padding: 16px 20px !important;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
+            font-size: 0.75rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.08em !important;
+            text-align: left !important;
         }
 
         .custom-table td {
@@ -58,28 +62,15 @@
             color: #f3f4f6 !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
             padding: 16px 20px !important;
-            font-size: 0.875rem;
+            font-size: 0.875rem !important;
             vertical-align: middle !important;
-            transition: background-color 0.15s ease-in-out;
+            text-align: left !important;
         }
 
         .custom-table tr:hover td {
             background-color: rgba(255, 255, 255, 0.03) !important;
         }
 
-        /* Custom Code Badge in Table */
-        .code-badge {
-            background-color: rgba(34, 197, 94, 0.1) !important;
-            color: #22c55e !important;
-            border: 1px solid rgba(34, 197, 94, 0.25) !important;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-
-        /* --- SEARCH CONTROLS --- */
         .search-input {
             background-color: #1f2937 !important;
             border: 1px solid #374151 !important;
@@ -123,7 +114,6 @@
             box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3) !important;
         }
 
-        /* Primary Add Customer Button */
         .btn-primary-custom {
             background: linear-gradient(135deg, #22c55e, #16a34a) !important;
             color: #ffffff !important;
@@ -141,7 +131,6 @@
             color: #ffffff !important;
         }
 
-        /* --- ACTION BUTTONS (Outline Soft Style) --- */
         .btn-action-edit {
             color: #22c55e !important;
             border: 1px solid rgba(34, 197, 94, 0.25) !important;
@@ -178,7 +167,6 @@
             box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4) !important;
         }
 
-        /* --- MODAL DARK THEME MATCHING --- */
         .modal-content-custom {
             background-color: #111827 !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -250,7 +238,6 @@
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
-    
     <div class="container-fluid px-4 py-4">
         <!-- Page Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -275,65 +262,16 @@
         <div class="row mb-4">
             <div class="col-md-5 col-lg-4">
                 <div class="input-group">
-                    <asp:TextBox ID="txtSearch" runat="server" CssClass="form-control search-input" Placeholder="Search by Name, Code, Phone..." />
-                    <asp:Button ID="btnSearch" runat="server" Text="Search" CssClass="btn btn-search-custom fw-bold px-4" OnClick="btnSearch_Click" />
+                    <input type="text" id="txtSearch" class="form-control search-input" placeholder="Search by Name, Code, Phone..." />
+                    <button type="button" id="btnSearch" class="btn btn-search-custom fw-bold px-4">Search</button>
                 </div>
             </div>
         </div>
 
         <!-- Grid Table Container -->
         <div class="card card-custom">
-            <div class="table-responsive">
-                <asp:GridView ID="gvCustomers" runat="server" AutoGenerateColumns="False" 
-                    CssClass="table custom-table align-middle" GridLines="None" DataKeyNames="CustomerId"
-                    OnRowCommand="gvCustomers_RowCommand">
-                    
-                    <Columns>
-                        <asp:TemplateField HeaderText="Code">
-                            <ItemTemplate>
-                                <span class="code-badge"><%# Eval("CustomerCode") %></span>
-                            </ItemTemplate>
-                        </asp:TemplateField>
-
-                        <asp:BoundField DataField="CustomerName" HeaderText="Customer Name" ItemStyle-CssClass="fw-semibold text-white" />
-                        <asp:BoundField DataField="ContactPerson" HeaderText="Contact Person" ItemStyle-CssClass="text-secondary" />
-                        <asp:BoundField DataField="PhoneNumber" HeaderText="Phone Number" />
-                        
-                        <asp:TemplateField HeaderText="Email">
-                            <ItemTemplate>
-                                <a href='mailto:<%# Eval("Email") %>' class="text-decoration-none text-emerald">
-                                    <%# Eval("Email") %>
-                                </a>
-                            </ItemTemplate>
-                        </asp:TemplateField>
-
-                        <asp:BoundField DataField="DeliveryAddress" HeaderText="Delivery Address" ItemStyle-CssClass="text-secondary" />
-                        
-                        <asp:TemplateField HeaderText="Actions" ItemStyle-Width="160px" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
-                            <ItemTemplate>
-                                <div class="d-inline-flex gap-1">
-                                    <asp:LinkButton ID="btnEdit" runat="server" CommandName="EditCustomer" 
-                                        CommandArgument='<%# Eval("CustomerId") %>' CssClass="btn btn-action-edit">
-                                        <i class="fa-solid fa-pen-to-square me-1"></i>Edit
-                                    </asp:LinkButton>
-                                    
-                                    <asp:LinkButton ID="btnDelete" runat="server" CommandName="DeleteCustomer" 
-                                        CommandArgument='<%# Eval("CustomerId") %>' CssClass="btn btn-action-delete"
-                                        OnClientClick="return confirm('Are you sure you want to delete this customer?');">
-                                        <i class="fa-solid fa-trash me-1"></i>Delete
-                                    </asp:LinkButton>
-                                </div>
-                            </ItemTemplate>
-                        </asp:TemplateField>
-                    </Columns>
-
-                    <EmptyDataTemplate>
-                        <div class="p-5 text-center text-secondary">
-                            <i class="fa-solid fa-inbox fs-2 d-block mb-3 text-muted"></i>
-                            No customer records found. Click 'Add Customer' to get started.
-                        </div>
-                    </EmptyDataTemplate>
-                </asp:GridView>
+            <div class="table-responsive-custom">
+                <table id="customerTable" class="table custom-table align-middle"></table>
             </div>
         </div>
     </div>
@@ -383,24 +321,139 @@
                 </div>
                 <div class="modal-footer modal-footer-custom">
                     <button type="button" class="btn btn-modal-cancel btn-sm px-3 py-2" data-bs-dismiss="modal">Cancel</button>
-                    <asp:Button ID="btnSaveCustomer" runat="server" Text="Save Customer" CssClass="btn btn-primary-custom btn-sm fw-bold px-4 py-2" OnClick="btnSaveCustomer_Click" />
+                    <button type="button" id="btnSaveCustomer" class="btn btn-primary-custom btn-sm fw-bold px-4 py-2" onclick="submitCustomerForm()">Save Customer</button>
                 </div>
             </div>
         </div>
     </div>
-
 </asp:Content>
 
 <asp:Content ID="Content3" ContentPlaceHolderID="ScriptContent" runat="server">
+    <script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
     <script>
         var customerModal;
+        var allCustomersCache = [];
 
         document.addEventListener("DOMContentLoaded", function () {
             var modalEl = document.getElementById('customerModal');
-            if (modalEl) {
+            if (modalEl && window.bootstrap && bootstrap.Modal) {
                 customerModal = new bootstrap.Modal(modalEl);
             }
+
+            initCustomerTable();
+
+            $("#btnSearch").click(function (e) {
+                e.preventDefault();
+                $('#customerTable').bootstrapTable('refresh');
+            });
+
+            $("#txtSearch").keyup(function (e) {
+                if (e.key === "Enter") {
+                    $('#customerTable').bootstrapTable('refresh');
+                }
+            });
         });
+
+        function initCustomerTable() {
+            $('#customerTable').bootstrapTable({
+                method: 'post',
+                contentType: "application/json; charset=utf-8",
+                ajax: customerTableAjax,
+                sidePagination: 'server',
+                pagination: true,
+                pageSize: 10,
+                pageList: [10, 25, 50, 100],
+                sortName: 'CustomerId',
+                sortOrder: 'desc',
+                search: false,
+                striped: true,
+                columns: [{
+                    field: 'CustomerCode',
+                    title: 'Code',
+                    sortable: true,
+                    formatter: codeFormatter
+                }, {
+                    field: 'CustomerName',
+                    title: 'Customer Name',
+                    sortable: true
+                }, {
+                    field: 'ContactPerson',
+                    title: 'Contact Person'
+                }, {
+                    field: 'PhoneNumber',
+                    title: 'Phone Number'
+                }, {
+                    field: 'Email',
+                    title: 'Email'
+                }, {
+                    field: 'DeliveryAddress',
+                    title: 'Delivery Address'
+                }, {
+                    field: 'CustomerId',
+                    title: 'Actions',
+                    align: 'right',
+                    escape: false,
+                    formatter: customerActionsFormatter
+                }]
+            });
+        }
+
+        function customerTableAjax(params) {
+            var searchVal = $("#txtSearch").val() || "";
+            $.ajax({
+                type: "POST",
+                url: "WebServices/CustomerService.asmx/GetCustomersPaged",
+                data: JSON.stringify({
+                    limit: params.data.limit,
+                    offset: params.data.offset,
+                    sort: params.data.sort || "CustomerId",
+                    order: params.data.order || "desc",
+                    search: searchVal
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var result = response.d;
+                    allCustomersCache = result.rows || [];
+                    params.success({ total: result.total, rows: result.rows });
+                },
+                error: function (xhr) {
+                    console.error("Customer grid load failed:", xhr.responseText);
+                    params.error();
+                }
+            });
+        }
+
+        function codeFormatter(code) {
+            return '<span class="code-badge">' + (code || '') + '</span>';
+        }
+
+        function customerActionsFormatter(customerId) {
+            return '<div class="d-inline-flex gap-2">' +
+                '<button type="button" class="btn btn-action-edit btn-sm" onclick="editCustomerById(' + customerId + ')">Edit</button>' +
+                '<button type="button" class="btn btn-action-delete btn-sm" onclick="deleteCustomer(' + customerId + ')">Delete</button>' +
+                '</div>';
+        }
+
+        function editCustomerById(customerId) {
+            var customer = allCustomersCache.find(c => c.CustomerId == customerId);
+            if (!customer) return;
+            editCustomer(customer);
+        }
+
+        function editCustomer(obj) {
+            if (!obj) return;
+            document.getElementById('<%= hfCustomerId.ClientID %>').value = obj.CustomerId || "0";
+            document.getElementById('<%= txtCustomerCode.ClientID %>').value = obj.CustomerCode || "";
+            document.getElementById('<%= txtCustomerName.ClientID %>').value = obj.CustomerName || "";
+            document.getElementById('<%= txtContactPerson.ClientID %>').value = obj.ContactPerson || "";
+            document.getElementById('<%= txtPhoneNumber.ClientID %>').value = obj.PhoneNumber || "";
+            document.getElementById('<%= txtEmail.ClientID %>').value = obj.Email || "";
+            document.getElementById('<%= txtDeliveryAddress.ClientID %>').value = obj.DeliveryAddress || "";
+
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-emerald me-2"></i>Edit Customer';
+            if (customerModal) customerModal.show();
+        }
 
         function openAddModal() {
             document.getElementById('<%= hfCustomerId.ClientID %>').value = "0";
@@ -412,15 +465,58 @@
             document.getElementById('<%= txtDeliveryAddress.ClientID %>').value = "";
 
             document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-user-plus text-emerald me-2"></i>Add Customer';
-            if (customerModal) {
-                customerModal.show();
-            }
+            if (customerModal) customerModal.show();
         }
 
-        function openModal() {
-            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-emerald me-2"></i>Edit Customer';
-            if (customerModal) {
-                customerModal.show();
+        function submitCustomerForm() {
+            var customer = {
+                customerId: parseInt(document.getElementById('<%= hfCustomerId.ClientID %>').value) || 0,
+                customerCode: document.getElementById('<%= txtCustomerCode.ClientID %>').value,
+                customerName: document.getElementById('<%= txtCustomerName.ClientID %>').value,
+                contactPerson: document.getElementById('<%= txtContactPerson.ClientID %>').value,
+                phoneNumber: document.getElementById('<%= txtPhoneNumber.ClientID %>').value,
+                email: document.getElementById('<%= txtEmail.ClientID %>').value,
+                deliveryAddress: document.getElementById('<%= txtDeliveryAddress.ClientID %>').value
+            };
+            saveCustomer(customer);
+        }
+
+        function saveCustomer(customer) {
+            $.ajax({
+                type: "POST",
+                url: "WebServices/CustomerService.asmx/SaveCustomer",
+                data: JSON.stringify(customer),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var result = response.d;
+                    if (result.success) {
+                        if (customerModal) customerModal.hide();
+                        $('#customerTable').bootstrapTable('refresh');
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            });
+        }
+
+        function deleteCustomer(id) {
+            if (confirm("Are you sure you want to delete this customer record?")) {
+                $.ajax({
+                    type: "POST",
+                    url: "WebServices/CustomerService.asmx/DeleteCustomer",
+                    data: JSON.stringify({ customerId: id }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        var result = response.d;
+                        if (result.success) {
+                            $('#customerTable').bootstrapTable('refresh');
+                        } else {
+                            alert(result.message);
+                        }
+                    }
+                });
             }
         }
     </script>

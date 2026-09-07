@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
 using System.Text;
 using System.Web.UI;
-using System.Web.UI.WebControls;
+using BusinessLayer;
 
 namespace WebUI
 {
     public partial class SearchReports : Page
     {
-        private readonly string connStr = ConfigurationManager.ConnectionStrings["DeliveryDbConn"].ConnectionString;
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Session["UserId"] == null)
@@ -20,7 +16,6 @@ namespace WebUI
                 return;
             }
 
-          
             string role = Session["UserRole"]?.ToString();
             if (role != "Admin" && role != "Super Admin")
             {
@@ -30,113 +25,67 @@ namespace WebUI
 
             if (!IsPostBack)
             {
-                BindSearchResults();
+                BindReportsData("", "");
             }
         }
 
-        protected void btnApplyFilter_Click(object sender, EventArgs e)
+        protected void btnApplyFilterServer_Click(object sender, EventArgs e)
         {
-            gvSearchResults.PageIndex = 0;
-            BindSearchResults();
+            BindReportsData(txtKeywords.Text.Trim(), ddlStatus.SelectedValue);
+        }
+        
+        private void BindReportsData(string keyword, string status)
+        {
+            try
+            {
+                DeliveryBLL deliveryBLL = new DeliveryBLL();
+                DataTable dt = deliveryBLL.GetFilteredDeliveriesTable(keyword, status);
+
+                rptReportsTable.DataSource = dt;
+                rptReportsTable.DataBind();
+            }catch(Exception ex)
+            {
+                lblMessage.Text = "Error loading reports data logs: " + ex.Message;
+                lblMessage.CssClass = "alert alert-danger fw-bold px-3 py-2 rounded-2 d-block";
+                lblMessage.Visible = true;
+            }
         }
 
-        protected void gvSearchResults_PageIndexChanging(object sender, GridViewPageEventArgs e)
+        protected string GetStatusBadgeClass(string status)
         {
-            gvSearchResults.PageIndex = e.NewPageIndex;
-            BindSearchResults();
+            if (string.IsNullOrEmpty(status)) return "bg-warning text-dark";
+            string s = status.ToLower();
+            if (s.Contains("pending")) return "bg-warning text-dark";
+            if (s.Contains("transit") || s.Contains("out")) return "bg-info text-dark";
+            if (s.Contains("delivered")) return "bg-success text-white";
+            if (s.Contains("failed") || s.Contains("cancelled")) return "bg-danger text-white";
+            return "bg-secondary text-white";
         }
 
-        private void BindSearchResults()
+        protected void btnExport_Click( object sender, EventArgs e)
         {
-            DataTable dt = GetFilteredData();
-            gvSearchResults.DataSource = dt;
-            gvSearchResults.DataBind();
-        }
-
-        private DataTable GetFilteredData()
-        {
-            DataTable dt = new DataTable();
-
             string keyword = txtKeywords.Text.Trim();
             string status = ddlStatus.SelectedValue;
 
-            using (SqlConnection con = new SqlConnection(connStr))
-            {
-                string query = @"SELECT 
-                            d.DeliveryId AS OrderId, 
-                            ISNULL(c.CustomerName, 'N/A') AS CustomerName, 
-                            ISNULL(dr.DriverName, 'Unassigned') AS DriverName, 
-                            ISNULL(c.DeliveryAddress, 'N/A') AS DeliveryAddress, 
-                            d.CreatedDate, 
-                            d.CurrentStatus 
-                         FROM Deliveries d
-                         LEFT JOIN Customers c ON d.CustomerId = c.CustomerId
-                         LEFT JOIN Drivers dr ON d.DriverId = dr.DriverId
-                         WHERE (@Keyword = '' 
-                             OR CAST(d.DeliveryId AS VARCHAR) LIKE '%' + @Keyword + '%' 
-                             OR c.CustomerName LIKE '%' + @Keyword + '%' 
-                             OR dr.DriverName LIKE '%' + @Keyword + '%')
-                           AND (@CurrentStatus = '' OR d.CurrentStatus = @CurrentStatus)
-                         ORDER BY d.CreatedDate DESC";
-
-                using (SqlCommand cmd = new SqlCommand(query, con))
-                {
-                    cmd.Parameters.AddWithValue("@Keyword", keyword);
-                    cmd.Parameters.AddWithValue("@CurrentStatus", status);
-
-                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-                    {
-                        da.Fill(dt);
-                    }
-                }
-            }
-
-            return dt;
-        }
-        protected string GetStatusBadgeCss(string status)
-        {
-            switch (status)
-            {
-                case "Pending":
-                    return "badge-pending";
-                case "In Transit":
-                    return "badge-intransit";
-                case "Delivered":
-                    return "badge-delivered";
-                case "Cancelled":
-                    return "badge-cancelled";
-                default:
-                    return "bg-secondary";
-            }
-        }
-
-        protected void btnExport_Click(object sender, EventArgs e)
-        {
-            DataTable dt = GetFilteredData();
+            DeliveryBLL deliveryBll = new DeliveryBLL();
+            DataTable dt = deliveryBll.GetFilteredDeliveriesTable(keyword, status);
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("Order ID,Customer Name,Driver Name,Delivery Address,Date Created,Status");
+            sb.AppendLine("Order ID, Customer Name, Driver Name, Delivery Address, Date Created, Status");
 
-            foreach (DataRow row in dt.Rows)
+            foreach( DataRow row in dt.Rows)
             {
-                string orderId = row["OrderId"].ToString().Replace(",", " ");
-                string customer = row["CustomerName"].ToString().Replace(",", " ");
-                string driver = row["DriverName"].ToString().Replace(",", " ");
-                string address = row["DeliveryAddress"].ToString().Replace(",", " ");
-                string createdDate = Convert.ToDateTime(row["CreatedDate"]).ToString("yyyy-MM-dd HH:mm");
-                string status = row["CurrentStatus"].ToString();
+                sb.AppendLine($"{row["OrderId"]}, {row["CustomerName"].ToString().Replace(",", " ")},{row["DriverName"].ToString().Replace(",", " ")},{row["DeliveryAddress"].ToString().Replace(",", " ")},{Convert.ToDateTime(row["CreatedDate"]):yyyy-MM-dd HH:mm},{row["CurrentStatus"]}");
 
-                sb.AppendLine($"{orderId},{customer},{driver},{address},{createdDate},{status}");
             }
 
             Response.Clear();
             Response.Buffer = true;
-            Response.AddHeader("content-disposition", "attachment;filename=DeliveryReport_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv");
-            Response.Charset = "";
+            Response.AddHeader("content-disposition", "attachment; filename = DeliveryReport_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".csv");
             Response.ContentType = "text/csv";
             Response.Output.Write(sb.ToString());
             Response.Flush();
             Response.End();
-        }
+        } 
     }
 }

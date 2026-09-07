@@ -162,7 +162,6 @@
                 </div>
             </div>
 
-            <!-- Solid White Map Graphic -->
            <div class="col-lg-5 text-center position-relative d-none d-lg-block">
                  <div class="hero-graphic-badge" style="padding-left: 20px;">
                  <i class="fa-solid fa-truck-fast" style="font-size: 10.5rem; color: #ffffff;"></i>

@@ -6,6 +6,7 @@
     <title>Delivery Update - DeliveryERP</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         :root {
             --bg-main: #0b0f19;
@@ -117,23 +118,19 @@
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-3">
-                    <span class="text-muted small">
-                        <i class="fa-regular fa-user-circle me-1"></i> <%= Session["Username"] %> 
-                        <span class="badge bg-secondary ms-1"><%= Session["Role"] %></span>
-                    </span>
                     <span class="text-white small">
-    <i class="fa-regular fa-user-circle me-1"></i> <%= Session["Username"] %> 
-   
-</span>
+                        <i class="fa-regular fa-user-circle me-1"></i> <%= Session["Username"] %> 
+                    </span>
                     <asp:Button ID="btnLogout" runat="server" Text="Logout" CssClass="btn btn-outline-danger btn-sm" OnClick="btnLogout_Click" />
                 </div>
             </div>
         </nav>
 
         <div class="container pb-5">
-            <asp:Panel ID="pnlAlert" runat="server" Visible="false" CssClass="alert alert-info alert-dismissible fade show col-md-8 mx-auto mb-4">
-                <asp:Label ID="lblAlert" runat="server"></asp:Label>
-            </asp:Panel>
+            <div id="pnlAlert" class="alert alert-dismissible fade show col-md-8 mx-auto mb-4 d-none" role="alert">
+                <span id="lblAlert"></span>
+                <button type="button" class="btn-close" onclick="$('#pnlAlert').addClass('d-none');"></button>
+            </div>
 
             <div class="erp-card shadow-lg col-md-8 mx-auto">
                 <div class="erp-card-header text-center py-3">
@@ -144,45 +141,175 @@
                     <!-- Delivery Selection Dropdown -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Select Delivery Order</label>
-                        <asp:DropDownList ID="ddlDeliveries" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlDeliveries_SelectedIndexChanged"></asp:DropDownList>
+                        <select id="ddlDeliveries" class="form-select"></select>
                     </div>
 
                     <!-- Status Workflow Dropdown -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Current Status</label>
-                        <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlStatus_SelectedIndexChanged">
-                            <asp:ListItem Value="Pending">Pending</asp:ListItem>
-                            <asp:ListItem Value="Out For Delivery">Out For Delivery</asp:ListItem>
-                            <asp:ListItem Value="Delivered">Delivered</asp:ListItem>
-                            <asp:ListItem Value="Failed">Failed</asp:ListItem>
-                        </asp:DropDownList>
+                        <select id="ddlStatus" class="form-select">
+                            <option value="Pending">Pending</option>
+                            <option value="Out For Delivery">Out For Delivery</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Failed">Failed</option>
+                        </select>
                     </div>
 
                     <!-- Delivery Notes -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Update Delivery Notes</label>
-                        <asp:TextBox ID="txtNotes" runat="server" TextMode="MultiLine" Rows="3" CssClass="form-control" placeholder="Enter delivery comments or progress notes..."></asp:TextBox>
+                        <textarea id="txtNotes" rows="3" class="form-control" placeholder="Enter delivery comments or progress notes..."></textarea>
                     </div>
 
                     <!-- Conditional Failure Reason Panel -->
-                    <asp:Panel ID="pnlFailure" runat="server" Visible="false" CssClass="mb-3">
+                    <div id="pnlFailure" class="mb-3 d-none">
                         <label class="form-label text-danger fw-bold">Failure Reason (Required for Failed status)</label>
-                        <asp:TextBox ID="txtFailureReason" runat="server" TextMode="MultiLine" Rows="2" CssClass="form-control border-danger" placeholder="e.g. Customer not available, Incorrect address..."></asp:TextBox>
-                    </asp:Panel>
+                        <textarea id="txtFailureReason" rows="2" class="form-control border-danger" placeholder="e.g. Customer not available, Incorrect address..."></textarea>
+                    </div>
 
                     <!-- Status History Info -->
-                <div class="mb-4 p-3" style="background-color: var(--input-bg); border-radius: 8px; border: 1px solid var(--input-border);">
-                    <span class="fw-bold" style="color: var(--text-main); font-size: 0.9rem;">
-                     <i class="fa-regular fa-clock me-1 text-success"></i>Delivered Date/Time:
-                     </span>
-                   <asp:Label ID="lblDeliveredAt" runat="server" Text="Not delivered yet" Font-Bold="true" CssClass="text-success ms-2"></asp:Label>
-                </div>
+                    <div class="mb-4 p-3" style="background-color: var(--input-bg); border-radius: 8px; border: 1px solid var(--input-border);">
+                        <span class="fw-bold" style="color: var(--text-main); font-size: 0.9rem;">
+                            <i class="fa-regular fa-clock me-1 text-success"></i>Delivered Date/Time:
+                        </span>
+                        <span id="lblDeliveredAt" class="text-success ms-2 fw-bold">N/A</span>
+                    </div>
 
-                    <asp:Button ID="btnUpdateStatus" runat="server" Text="Record Status Change" CssClass="btn btn-emerald w-100" OnClick="btnUpdateStatus_Click" />
+                    <button type="button" id="btnUpdateStatus" class="btn btn-emerald w-100">Record Status Change</button>
                 </div>
             </div>
         </div>
-
     </form>
+
+    <script>
+        $(document).ready(function () {
+            loadDeliveriesDropdown(0);
+
+            $('#ddlDeliveries').on('change', function () {
+                var selectedId = $(this).val();
+                if (selectedId && selectedId > 0) {
+                    loadDeliveryRecord(selectedId);
+                }
+            });
+
+            $('#ddlStatus').on('change', function () {
+                toggleFailurePanel($(this).val());
+            });
+
+            $('#btnUpdateStatus').on('click', function () {
+                updateDeliveryStatus();
+            });
+        });
+
+        function showAlert(message, type) {
+            $('#lblAlert').text(message);
+            $('#pnlAlert').removeClass().addClass('alert alert-' + type + ' alert-dismissible fade show col-md-8 mx-auto mb-4');
+        }
+
+        function toggleFailurePanel(status) {
+            if (status === 'Failed') {
+                $('#pnlFailure').removeClass('d-none');
+            } else {
+                $('#pnlFailure').addClass('d-none');
+            }
+        }
+
+        function loadDeliveriesDropdown(selectDeliveryId) {
+            $.ajax({
+                type: "POST",
+                url: "DeliveryUpdateService.asmx/GetDeliveriesDropdown",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (res) {
+                    var r = res.d;
+                    if (r.redirect) {
+                        window.location.href = "Login.aspx";
+                        return;
+                    }
+                    if (r.success) {
+                        var $ddl = $('#ddlDeliveries');
+                        $ddl.empty();
+                        $.each(r.data, function (i, item) {
+                            $ddl.append($('<option>', { value: item.Value, text: item.Text }));
+                        });
+
+                        if (selectDeliveryId > 0) {
+                            $ddl.val(selectDeliveryId);
+                        }
+
+                        if ($ddl.val()) {
+                            loadDeliveryRecord($ddl.val());
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadDeliveryRecord(deliveryId) {
+            $.ajax({
+                type: "POST",
+                url: "DeliveryUpdateService.asmx/GetDeliveryRecord",
+                data: JSON.stringify({ deliveryId: parseInt(deliveryId) }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (res) {
+                    var r = res.d;
+                    if (r.redirect) {
+                        window.location.href = "Login.aspx";
+                        return;
+                    }
+                    if (r.success) {
+                        $('#ddlStatus').val(r.currentStatus);
+                        $('#txtNotes').val(r.deliveryNotes);
+                        $('#txtFailureReason').val(r.failureReason);
+                        $('#lblDeliveredAt').text(r.deliveredAt);
+                        toggleFailurePanel(r.currentStatus);
+                    } else {
+                        showAlert(r.message, 'danger');
+                    }
+                }
+            });
+        }
+
+        function updateDeliveryStatus() {
+            var deliveryId = $('#ddlDeliveries').val();
+            var status = $('#ddlStatus').val();
+            var notes = $('#txtNotes').val();
+            var failureReason = $('#txtFailureReason').val();
+
+            if (!deliveryId) return;
+
+            if (status === "Failed" && !$.trim(failureReason)) {
+                showAlert("Please record a Failure Reason before marking the delivery as Failed.", "danger");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "DeliveryUpdateService.asmx/UpdateDeliveryStatus",
+                data: JSON.stringify({
+                    deliveryId: parseInt(deliveryId),
+                    status: status,
+                    notes: notes,
+                    failureReason: failureReason
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (res) {
+                    var r = res.d;
+                    if (r.redirect) {
+                        window.location.href = "Login.aspx";
+                        return;
+                    }
+                    if (r.success) {
+                        showAlert(r.message, "success");
+                        loadDeliveriesDropdown(deliveryId);
+                    } else {
+                        showAlert(r.message, "danger");
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>

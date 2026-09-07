@@ -89,7 +89,7 @@
             transform: translateY(-1px);
         }
     </style>
-
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <asp:ContentPlaceHolder ID="HeadContent" runat="server"></asp:ContentPlaceHolder>
 </head>
 <body>
@@ -109,7 +109,6 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <%-- Display header options ONLY when user is logged in --%>
                     <% if (Session["UserId"] != null) { %>
                         <ul class="navbar-nav ms-auto align-items-center me-4">
                             <li class="nav-item"><a class="nav-link" href="Default.aspx">Home</a></li>

@@ -5,6 +5,7 @@
 <head runat="server">
     <title>Delivery Management - DeliveryERP</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <style>
         :root {
@@ -25,7 +26,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* Navbar Styling */
         .erp-navbar {
             background-color: var(--card-bg);
             border-bottom: 1px solid var(--card-border);
@@ -54,7 +54,6 @@
             color: #ffffff;
         }
 
-        /* Cards & Containers */
         .erp-card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -69,7 +68,6 @@
             color: #ffffff;
         }
 
-        /* Form Controls */
         .form-label {
             color: var(--text-muted);
             font-size: 0.875rem;
@@ -87,7 +85,6 @@
             border-color: var(--accent-green) !important;
             box-shadow: 0 0 0 0.25rem rgba(34, 197, 94, 0.25) !important;
         }
-
         
         .btn-emerald {
             background-color: var(--accent-green);
@@ -115,87 +112,76 @@
             color: #ffffff;
         }
 
-       
         .table-dark-custom {
-            color: var(--text-main);
-            margin-bottom: 0;
+            width: 100% !important;
+            background-color: #111827 !important;
+            border: 1px solid #374151 !important;
+            border-radius: 6px !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            overflow: hidden !important;
+            margin-bottom: 0 !important;
         }
 
         .table-dark-custom th {
-            background-color: #1a2332;
-            border-bottom: 1px solid var(--card-border);
-            color: var(--text-muted);
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
+            background-color: #1a2332 !important;
+            color: #9ca3af !important;
+            font-size: 0.8rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            padding: 12px 16px !important;
+            border-bottom: 1px solid #1f2937 !important;
+            text-align: left !important;
         }
-        #<%= gvDeliveries.ClientID %> td, 
-        #<%= gvDeliveries.ClientID %> th
-        {
-        color: #ffffff !important;
-        }
+
         .table-dark-custom td {
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--card-border);
-            vertical-align: middle;
+            background-color: #111827 !important;
+            color: #ffffff !important;
+            padding: 12px 16px !important;
+            border-bottom: 1px solid #1f2937 !important;
+            vertical-align: middle !important;
+            text-align: left !important;
         }
-    
-.card-overview-container {
-    background-color: #111827 !important;
-    border: 1px solid #1f2937 !important;
-    border-radius: 10px !important;
-    padding: 1.5rem !important;
-    margin-top: 1.5rem !important;
-}
 
-.table-dark-custom {
-    width: 100% !important;
-    background-color: #111827 !important;
-    border: 1px solid #374151 !important;
-    border-radius: 6px !important;
-    border-collapse: separate !important;
-    border-spacing: 0 !important;
-    overflow: hidden !important;
-    margin-bottom: 0 !important;
-}
+        .table-dark-custom tr:last-child td {
+            border-bottom: none !important;
+        }
 
+        .fixed-table-pagination .pagination-detail,
+        .fixed-table-pagination .page-list {
+            color: var(--text-muted) !important;
+        }
 
-.table-dark-custom th {
-    background-color: #111827 !important;
-    color: #9ca3af !important;
-    font-size: 0.8rem !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    padding: 12px 16px !important;
-    border-bottom: 1px solid #1f2937 !important;
-    text-align: left !important;
-}
+        .page-item .page-link {
+            background-color: var(--input-bg) !important;
+            border-color: var(--card-border) !important;
+            color: var(--text-main) !important;
+        }
 
+        .page-item.active .page-link {
+            background-color: var(--accent-green) !important;
+            border-color: var(--accent-green) !important;
+            color: #000000 !important;
+            font-weight: bold;
+        }
 
-.table-dark-custom td {
-    background-color: #111827 !important;
-    color: #ffffff !important;
-    padding: 12px 16px !important;
-    border-bottom: 1px solid #1f2937 !important;
-    vertical-align: middle !important;
-    text-align: left !important;
-}
+        .bootstrap-table .search input {
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--input-border) !important;
+            color: var(--text-main) !important;
+            border-radius: 6px;
+        }
 
-
-.table-dark-custom tr:last-child td {
-    border-bottom: none !important;
-}
-        .badge-pending { background-color: #f59e0b; color: #000; }
-        .badge-out { background-color: #3b82f6; color: #fff; }
-        .badge-delivered { background-color: var(--accent-green); color: #000; }
-        .badge-failed { background-color: #ef4444; color: #fff; }
+        .badge-pending { background-color: #f59e0b; color: #000; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
+        .badge-out { background-color: #3b82f6; color: #fff; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
+        .badge-delivered { background-color: var(--accent-green); color: #000; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
+        .badge-failed { background-color: #ef4444; color: #fff; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
     </style>
 </head>
 <body>
     <form id="form1" runat="server">
         
-   
         <nav class="erp-navbar py-3 mb-4">
             <div class="container d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-4">
@@ -203,7 +189,7 @@
                         <i class="fa-solid fa-truck-fast me-2 text-success"></i>Delivery<span>ERP</span>
                     </div>
                     <div class="d-none d-md-flex align-items-center gap-2">
-                        <a href ="Default.aspx" class ="nav-link-custom"><i class="fa-solid fa-house me-1"></i>Home</a>
+                        <a href="Default.aspx" class="nav-link-custom"><i class="fa-solid fa-house me-1"></i>Home</a>
                         <a href="DeliveryManagement.aspx" class="nav-link-custom active fw-bold text-success">Deliveries</a>
                         <a href="DeliveryUpdate.aspx" class="nav-link-custom">Update Status</a>
                     </div>
@@ -213,11 +199,7 @@
                         <i class="fa-regular fa-user-circle me-1"></i> <%= Session["Username"] %> 
                         <span class="badge bg-secondary ms-1"><%= Session["Role"] %></span>
                     </span>
-                    <span class="text-white small">
-                   <i class="fa-regular fa-user-circle me-1"></i> <%= Session["Username"] %> 
-                 
-                   </span>
-                    <asp:Button ID="btnLogout" runat="server" Text="Logout" CssClass="btn btn-outline-danger btn-sm" OnClick="btnLogout_Click" />
+                  <a href="Logout.aspx" class="btn btn-outline-danger btn-sm">Logout</a>
                 </div>
             </div>
         </nav>
@@ -270,66 +252,338 @@
                     <!-- Dynamic Items Grid -->
                     <h6 class="text-white fw-bold mb-3"><i class="fa-solid fa-list-check me-2 text-success"></i>Delivery Items</h6>
                     <div class="table-responsive mb-3">
-                        <asp:GridView ID="gvItems" runat="server" AutoGenerateColumns="False" CssClass="table table-dark-custom" OnRowCommand="gvItems_RowCommand">
-                            <Columns>
-                                <asp:TemplateField HeaderText="Item Code">
-                                    <ItemTemplate>
-                                        <asp:TextBox ID="txtItemCode" runat="server" Text='<%# Eval("ItemCode") %>' CssClass="form-control form-control-sm"></asp:TextBox>
-                                    </ItemTemplate>
-                                </asp:TemplateField>
-                                <asp:TemplateField HeaderText="Item Name">
-                                    <ItemTemplate>
-                                        <asp:TextBox ID="txtItemName" runat="server" Text='<%# Eval("ItemName") %>' CssClass="form-control form-control-sm"></asp:TextBox>
-                                    </ItemTemplate>
-                                </asp:TemplateField>
-                                <asp:TemplateField HeaderText="Quantity">
-                                    <ItemTemplate>
-                                        <asp:TextBox ID="txtQuantity" runat="server" Text='<%# Eval("Quantity") %>' TextMode="Number" CssClass="form-control form-control-sm"></asp:TextBox>
-                                    </ItemTemplate>
-                                </asp:TemplateField>
-                                <asp:TemplateField HeaderText="Action">
-                                    <ItemTemplate>
-                                        <asp:Button ID="btnRemoveRow" runat="server" CommandName="RemoveRow" CommandArgument='<%# Container.DataItemIndex %>' Text="Remove" CssClass="btn btn-sm btn-outline-danger" />
-                                    </ItemTemplate>
-                                </asp:TemplateField>
-                            </Columns>
-                        </asp:GridView>
+                        <table id="tblItems" class="table table-dark-custom">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30%;">Item Code</th>
+                                    <th style="width: 45%;">Item Name</th>
+                                    <th style="width: 15%;">Quantity</th>
+                                    <th style="width: 10%;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
 
-                    <asp:Button ID="btnAddRow" runat="server" Text="+ Add Row" CssClass="btn btn-outline-custom btn-sm mb-4" OnClick="btnAddRow_Click" />
-                    <div>
-                        <asp:Button ID="btnSave" runat="server" Text="Save Delivery Record" CssClass="btn btn-emerald" OnClick="btnSave_Click" />
-                    </div>
+                    <button type="button" id="btnAddRow" class="btn btn-outline-success" onclick="addNewItemRow()">+ Add Row</button>
+                    <button type="button" id="btnSave" class="btn btn-success ms-2" onclick="saveDeliveryForm()">Save Delivery Record</button>
                 </div>
             </div>
 
             <!-- Master Records Table -->
-            <div class="erp-card shadow-lg">
-                <div class="erp-card-header">
+            <div class="erp-card shadow-lg p-3">
+                <div class="erp-card-header mb-3 ps-1">
                     <i class="fa-solid fa-table-list me-2 text-success"></i>Deliveries Overview
                 </div>
-                <div class="table-responsive">
-                   <asp:GridView ID="gvDeliveries" runat="server" AutoGenerateColumns="False" DataKeyNames="DeliveryId,CreatedBy" CssClass="table table-dark-custom" OnRowCommand="gvDeliveries_RowCommand">
-    <Columns>
-        <asp:BoundField DataField="DeliveryNumber" HeaderText="Delivery #" />
-        <asp:BoundField DataField="DeliveryDate" HeaderText="Date" DataFormatString="{0:yyyy-MM-dd}" />
-        <asp:BoundField DataField="CustomerName" HeaderText="Customer" />
-        <asp:BoundField DataField="DriverName" HeaderText="Driver" />
-        <asp:BoundField DataField="DeliveryAddress" HeaderText="Address" />
-        <asp:BoundField DataField="DeliveryNotes" HeaderText="Notes" />
-        <asp:BoundField DataField="CurrentStatus" HeaderText="Status" />
-        <asp:TemplateField HeaderText="Actions">
-            <ItemTemplate>
-                <asp:Button ID="btnEdit" runat="server" CommandName="EditRow" CommandArgument='<%# Container.DataItemIndex %>' Text="Edit" CssClass="btn btn-sm btn-outline-light me-1" />
-                <asp:Button ID="btnDelete" runat="server" CommandName="DeleteRow" CommandArgument='<%# Container.DataItemIndex %>' Text="Delete" CssClass="btn btn-sm btn-outline-danger" OnClientClick="return confirm('Delete this record?');" />
-            </ItemTemplate>
-        </asp:TemplateField>
-    </Columns>
-</asp:GridView>
-                </div>
+                <table id="tblDeliveries" class="table table-dark-custom"></table>
             </div>
         </div>
 
     </form>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        loadDropdownsOnly();
+        addNewItemRow();
+        initDeliveriesTable();
+    });
+
+    function loadDropdownsOnly() {
+        $.ajax({
+            type: "POST",
+            url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/GetInitialData") %>',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                var res = response.d;
+                if (!res.success) {
+                    alert("Error loading data: " + res.message);
+                    return;
+                }
+                populateDropdown($('#<%= ddlCustomer.ClientID %>'), res.customers, "CustomerId", "CustomerName");
+                populateDropdown($('#<%= ddlDriver.ClientID %>'), res.drivers, "DriverId", "DriverName");
+            },
+            error: function (xhr) {
+                console.error("AJAX Error details: ", xhr.responseText);
+            }
+        });
+    }
+
+    function populateDropdown(selectEl, items, valueField, textField) {
+        var currentVal = selectEl.val();
+        selectEl.empty();
+        selectEl.append('<option value="">-- Select --</option>');
+        $.each(items, function (i, item) {
+            selectEl.append(`<option value="${item[valueField]}">${item[textField]}</option>`);
+        });
+        if (currentVal) selectEl.val(currentVal);
+    }
+
+    function initDeliveriesTable() {
+        $('#tblDeliveries').bootstrapTable('destroy').bootstrapTable({
+            cache: false,
+            method: 'post',
+            contentType: "application/json; charset=utf-8",
+            ajax: deliveryTableAjax,
+            sidePagination: 'server',
+            pagination: true,
+            pageSize: 10,
+            pageList: [10, 25, 50, 100],
+            sortName: 'DeliveryId',
+            sortOrder: 'desc',
+            search: true,
+            columns: [{
+                field: 'DeliveryId',
+                title: 'Delivery ID',
+                sortable: true
+            }, {
+                field: 'DeliveryNumber',
+                title: 'Delivery #',
+                sortable: true
+            }, {
+                field: 'DeliveryDate',
+                title: 'Date',
+                sortable: true
+            }, {
+                field: 'CustomerName',
+                title: 'Customer',
+                sortable: true
+            }, {
+                field: 'DriverName',
+                title: 'Driver',
+                sortable: false
+            }, {
+                field: 'DeliveryAddress',
+                title: 'Address',
+                sortable: false
+            }, {
+                field: 'CurrentStatus',
+                title: 'Status',
+                sortable: false,
+                formatter: statusFormatter
+            }, {
+                field: 'DeliveryId',
+                title: 'Actions',
+                escape: false,
+                formatter: deliveryActionsFormatter
+            }]
+        });
+    }
+
+    function deliveryTableAjax(params) {
+        $.ajax({
+            type: "POST",
+            url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/GetDeliveriesPaged") %>',
+        data: JSON.stringify({
+            limit: params.data.limit || 10,
+            offset: params.data.offset || 0,
+            sort: params.data.sort || "DeliveryId",
+            order: params.data.order || "desc",
+            search: params.data.search || ""
+        }),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (response) {
+            var data = response.d ? response.d : response;
+            if (typeof data === 'string') {
+                data = JSON.parse(data);
+            }
+            if (Array.isArray(data)) {
+                params.success({
+                    total: data.length,
+                    rows: data
+                });
+            } else {
+                params.success({
+                    total: data.total || 0,
+                    rows: data.rows || []
+                });
+            }
+        },
+        error: function (xhr) {
+            console.error("Delivery grid load failed: ", xhr.responseText);
+            params.error();
+        }
+    });
+}
+
+    function statusFormatter(value, row, index) {
+        var status = value || "";
+        var badgeClass = "badge bg-secondary";
+        var s = status.trim().toLowerCase();
+        if (s === "pending") badgeClass = "badge-pending";
+        else if (s === "out for delivery") badgeClass = "badge-out";
+        else if (s === "delivered") badgeClass = "badge-delivered";
+        else if (s === "failed") badgeClass = "badge-failed";
+        return '<span class="' + badgeClass + '">' + status + '</span>';
+    }
+
+    function deliveryActionsFormatter(value, row, index) {
+        var deliveryId = value;
+        return '<button type="button" class="btn btn-sm btn-outline-info me-1" onclick="loadDeliveryForEdit(' + deliveryId + ')"><i class="fa-solid fa-pen-to-square"></i></button>' +
+            '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteDeliveryRecord(' + deliveryId + ')"><i class="fa-solid fa-trash-can"></i></button>';
+    }
+
+    function loadDeliveryForEdit(deliveryId) {
+        $.ajax({
+            type: "POST",
+            url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/LoadDelivery") %>',
+            data: JSON.stringify({ deliveryId: deliveryId }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                var res = response.d;
+                if (res.success) {
+                    $('#<%= hfDeliveryId.ClientID %>').val(res.master.DeliveryId);
+                    $('#<%= txtDeliveryDate.ClientID %>').val(res.master.DeliveryDate);
+                    $('#<%= ddlCustomer.ClientID %>').val(res.master.CustomerId);
+                    $('#<%= ddlDriver.ClientID %>').val(res.master.DriverId);
+                    $('#<%= txtAddress.ClientID %>').val(res.master.DeliveryAddress);
+                    $('#<%= txtNotes.ClientID %>').val(res.master.DeliveryNotes);
+                    $('#<%= ddlStatus.ClientID %>').val(res.master.CurrentStatus);
+
+                    $('#tblItems tbody').empty();
+                    if (res.items && res.items.length > 0) {
+                        $.each(res.items, function (index, item) {
+                            addNewItemRow(item.ItemCode, item.ItemName, item.Quantity);
+                        });
+                    } else {
+                        addNewItemRow();
+                    }
+
+                    $('html, body').animate({ scrollTop: 0 }, 'fast');
+                } else {
+                    alert("Could not load details: " + res.message);
+                }
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                alert("Error communicating with service while loading delivery profile.");
+            }
+        });
+    }
+
+    function deleteDeliveryRecord(deliveryId) {
+        if (confirm("Are you sure you want to completely erase delivery data profile #" + deliveryId + "?")) {
+            $.ajax({
+                type: "POST",
+                url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/DeleteDelivery") %>',
+                data: JSON.stringify({ deliveryId: deliveryId }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var res = response.d;
+                    alert(res.message);
+                    if (res.success) {
+                        $('#tblDeliveries').bootstrapTable('refresh');
+                    }
+                },
+                error: function (xhr) {
+                    alert("Error handling request: " + xhr.responseText);
+                }
+            });
+        }
+    }
+
+    function saveDeliveryForm(e) {
+        if (e && e.preventDefault) { e.preventDefault(); }
+
+        var deliveryId = parseInt($('#<%= hfDeliveryId.ClientID %>').val()) || 0;
+        var deliveryDate = $('#<%= txtDeliveryDate.ClientID %>').val();
+        var customerId = parseInt($('#<%= ddlCustomer.ClientID %>').val()) || 0;
+        var driverId = parseInt($('#<%= ddlDriver.ClientID %>').val()) || 0;
+        var address = $('#<%= txtAddress.ClientID %>').val();
+        var notes = $('#<%= txtNotes.ClientID %>').val();
+        var status = $('#<%= ddlStatus.ClientID %>').val();
+
+        if (!deliveryDate || customerId === 0 || driverId === 0) {
+            alert("Please fill out all required fields (Date, Customer, and Driver).");
+            return false;
+        }
+
+        var items = [];
+        $('#tblItems tbody tr').each(function () {
+            var code = $(this).find("input[id*='txtItemCode']").val();
+            var name = $(this).find("input[id*='txtItemName']").val();
+            var qty = $(this).find("input[id*='txtQuantity']").val();
+            if (code || name) {
+                items.push({ ItemCode: code || "", ItemName: name || "", Quantity: parseInt(qty) || 1 });
+            }
+        });
+
+        var payload = {
+            deliveryId: deliveryId,
+            deliveryDate: deliveryDate,
+            customerId: customerId,
+            driverId: driverId,
+            address: address,
+            notes: notes,
+            status: status,
+            items: items
+        };
+
+        $.ajax({
+            type: "POST",
+            url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/SaveDelivery") %>',
+            data: JSON.stringify(payload),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                var res = response.d;
+                alert(res.message);
+                if (res.success) {
+                    resetFormFields();
+                    $('#tblDeliveries').bootstrapTable('refresh');
+                }
+            },
+            error: function (xhr) {
+                alert("Error saving record: " + xhr.responseText);
+            }
+        });
+
+        return false;
+    }
+
+    function resetFormFields() {
+        $('#<%= hfDeliveryId.ClientID %>').val('0');
+        $('#<%= txtDeliveryDate.ClientID %>').val('');
+        $('#<%= ddlCustomer.ClientID %>').val('');
+        $('#<%= ddlDriver.ClientID %>').val('');
+        $('#<%= txtAddress.ClientID %>').val('');
+        $('#<%= txtNotes.ClientID %>').val('');
+        $('#<%= ddlStatus.ClientID %>').val('Pending');
+        $('#tblItems tbody').empty();
+        addNewItemRow();
+    }
+
+    function addNewItemRow(itemCode, itemName, quantity) {
+        var codeValue = itemCode || "";
+        var nameValue = itemName || "";
+        var qtyValue = quantity || 1;
+
+        var rowHtml = `<tr>
+            <td><input type="text" id="txtItemCode" class="form-control form-control-sm" value="${codeValue}" placeholder="Code..." /></td>
+            <td><input type="text" id="txtItemName" class="form-control form-control-sm" value="${nameValue}" placeholder="Item Name..." /></td>
+            <td><input type="number" id="txtQuantity" class="form-control form-control-sm" value="${qtyValue}" min="1" /></td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeItemRow(this)">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </td>
+        </tr>`;
+
+        $('#tblItems tbody').append(rowHtml);
+    }
+
+    function removeItemRow(btn) {
+        $(btn).closest('tr').remove();
+        if ($('#tblItems tbody tr').length === 0) {
+            addNewItemRow();
+        }
+    }
+</script>
 </body>
 </html>

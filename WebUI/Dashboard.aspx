@@ -2,7 +2,7 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
     <style>
-        /* Header Section */
+       
         .dashboard-header {
             margin-bottom: 1.75rem;
         }
@@ -36,7 +36,6 @@
             background: rgba(34, 197, 94, 0.05);
         }
 
-        /* Access Restricted Banner */
         .alert-access-denied {
             background-color: rgba(239, 68, 68, 0.12);
             border: 1px solid #ef4444;
@@ -46,7 +45,7 @@
             font-size: 0.95rem;
         }
 
-        /* 1. Quick Actions Section */
+  
         .quick-actions-card {
             background-color: #0b0e1b;
             border: 1px solid #1e293b;
@@ -100,7 +99,7 @@
         .icon-deliveries { color: #f59e0b; }
         .icon-reports { color: #22c55e; }
 
-        /* 2. Glassmorphism Big Arc Diagram Section */
+      
         .diagram-wrapper-full {
             background-color: #0b0e1b;
             border: 1px solid #1e293b;
@@ -178,7 +177,6 @@
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
-        /* Connecting Diagram Nodes */
         .node-point {
             width: 14px;
             height: 14px;
@@ -222,7 +220,7 @@
             height: 100%;
         }
 
-        /* Metrics Cards */
+       
         .metric-card {
             background-color: #13192e;
             border: 1px solid #1e293b;
@@ -293,7 +291,6 @@
         .icon-delivered { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
         .icon-failed { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 
-        /* Dark Table Card */
         .table-card {
             background-color: #0b0e1b;
             border: 1px solid #1e293b;
@@ -345,7 +342,6 @@
             background-color: #0b0e1b;
         }
 
-        /* Status Badge Styling */
         .badge-status {
             padding: 0.35em 0.8em;
             border-radius: 50rem;
@@ -359,6 +355,79 @@
         .badge-status-delivered { background-color: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
         .badge-status-failed { background-color: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
     </style>
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchDashboardData();
+        });
+
+        function getBadgeClass(status) {
+            var s = status.toLowerCase();
+            if (s.includes("pending")) return "badge-status-pending";
+            if (s.includes("out") || s.includes("transit")) return "badge-status-ofd";
+            if (s.includes("delivered")) return "badge-status-delivered";
+            if (s.includes("fail") || s.includes("cancel")) return "badge-status-failed";
+            return "badge-status-pending";
+        }
+
+        function fetchDashboardData() {
+            var serviceUrl = '<%= ResolveUrl("~/WebServices/DashboardService.asmx/GetDashboardMetrics") %>';
+
+            fetch(serviceUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8"
+                },
+                body: JSON.stringify({})
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("HTTP error! Status: " + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var res = data.d;
+                    if (res && res.success) {
+
+                    document.getElementById("<%= lblGaugeTotal.ClientID %>").innerText = res.stats.TotalDeliveries ?? 0;
+                    document.getElementById("<%= lblTotalDeliveries.ClientID %>").innerText = res.stats.TotalDeliveries ?? 0;
+                    document.getElementById("<%= lblPending.ClientID %>").innerText = res.stats.PendingCount ?? 0;
+                    document.getElementById("<%= lblOutForDelivery.ClientID %>").innerText = res.stats.OutForDeliveryCount ?? 0;
+                    document.getElementById("<%= lblDelivered.ClientID %>").innerText = res.stats.DeliveredCount ?? 0;
+                    document.getElementById("<%= lblFailedDeliveries.ClientID %>").innerText = res.stats.FailedCount ?? 0;
+
+                    var tbody = document.querySelector("#tblRecentDeliveries tbody");
+                    tbody.innerHTML = "";
+
+                    if (!res.deliveries || res.deliveries.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No recent dispatches found</td></tr>';
+                        return;
+                    }
+
+                    var tableContent = "";
+                    res.deliveries.forEach(function (item) {
+                        var statusClass = getBadgeClass(item.CurrentStatus);
+                        tableContent += `<tr>
+                            <td>${item.DeliveryNo}</td>
+                            <td class='text-white fw-semibold'>${item.CustomerName}</td>
+                            <td>${item.DriverName}</td>
+                            <td>${item.DeliveryDate}</td>
+                            <td>${item.Address}</td>
+                            <td><span class='badge-status ${statusClass}'>${item.CurrentStatus}</span></td>
+                        </tr>`;
+                    });
+                    tbody.innerHTML = tableContent;
+
+                } else {
+                    console.error("Service exception returned: ", res ? res.message : "Malformed Response");
+                }
+            })
+                .catch(error => {
+                    console.error("Network/Endpoint connection failure: ", error);
+                });
+        }
+    </script>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
@@ -381,9 +450,9 @@
             <p class="dashboard-subtitle mb-0">Real-time overview of active delivery operations, dispatch statuses, and performance metrics.</p>
         </div>
         <div>
-            <asp:LinkButton ID="btnRefresh" runat="server" CssClass="btn-refresh text-decoration-none" OnClick="btnRefresh_Click">
+           <a href="javascript:void(0);" class="btn-refresh text-decoration-none" onclick="location.reload();">
                 <i class="fa-solid fa-rotate-right me-2"></i>Refresh Data
-            </asp:LinkButton>
+           </a>
         </div>
     </div>
 
@@ -526,24 +595,23 @@
             <a href="DeliveryManagement.aspx" class="text-success small fw-bold text-decoration-none">View All Deliveries &rarr;</a>
         </div>
         
-        <div class="table-responsive">
-            <asp:GridView ID="gvRecentDeliveries" runat="server" AutoGenerateColumns="False" 
-                CssClass="table custom-table" GridLines="None" EmptyDataText="No matching records found">
-                <Columns>
-                    <asp:BoundField DataField="DeliveryNo" HeaderText="DELIVERY NO" />
-                    <asp:BoundField DataField="CustomerName" HeaderText="CUSTOMER" />
-                    <asp:BoundField DataField="DriverName" HeaderText="ASSIGNED DRIVER" />
-                    <asp:BoundField DataField="DeliveryDate" HeaderText="DELIVERY DATE" DataFormatString="{0:yyyy-MM-dd}" />
-                    <asp:BoundField DataField="Address" HeaderText="ADDRESS" />
-                    <asp:TemplateField HeaderText="CURRENT STATUS">
-                        <ItemTemplate>
-                            <span class='<%# GetStatusBadgeClass(Eval("CurrentStatus")) %>'>
-                                <%# Eval("CurrentStatus") %>
-                            </span>
-                        </ItemTemplate>
-                    </asp:TemplateField>
-                </Columns>
-            </asp:GridView>
-        </div>
+       <div class="table-responsive">
+    <table class="table custom-table" id="tblRecentDeliveries">
+        <thead>
+            <tr>
+                <th>Delivery No</th>
+                <th>Customer</th>
+                <th>Assigned Driver</th>
+                <th>Delivery Date</th>
+                <th>Address</th>
+                <th>Current Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </asp:Content>

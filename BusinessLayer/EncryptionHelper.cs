@@ -8,14 +8,21 @@ namespace BusinessLayer
     public static class EncryptionHelper
     {
       
-        private static readonly string SecretKey = "DeliveryERP_SecretKey_@2026#Db"; 
-        private static readonly string SecretIV = "DeliveryERP_IV#1";           
+      
+        private static readonly string SecretKey = "DeliveryERP_SecretKey_@2026#Db";
+        private static readonly string SecretIV = "DeliveryERP_IV#1";
 
+        private static byte[] GetKeyBytes()
+        {
+            using (SHA256 sha = SHA256.Create())
+            {
+                return sha.ComputeHash(Encoding.UTF8.GetBytes(SecretKey)); 
+            }
+        }
         public static string Encrypt(string plainText)
         {
             if (string.IsNullOrEmpty(plainText)) return plainText;
-
-            byte[] keyBytes = Encoding.UTF8.GetBytes(SecretKey);
+            byte[] keyBytes = GetKeyBytes();
             byte[] ivBytes = Encoding.UTF8.GetBytes(SecretIV);
 
             using (Aes aes = Aes.Create())
@@ -43,7 +50,7 @@ namespace BusinessLayer
         {
             if (string.IsNullOrEmpty(cipherText)) return cipherText;
 
-            byte[] keyBytes = Encoding.UTF8.GetBytes(SecretKey);
+            byte[] keyBytes = GetKeyBytes();
             byte[] ivBytes = Encoding.UTF8.GetBytes(SecretIV);
 
             using (Aes aes = Aes.Create())
