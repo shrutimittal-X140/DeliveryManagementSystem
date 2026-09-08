@@ -213,11 +213,10 @@
                 $('#pnlFailure').addClass('d-none');
             }
         }
-
         function loadDeliveriesDropdown(selectDeliveryId) {
             $.ajax({
                 type: "POST",
-                url: "DeliveryUpdateService.asmx/GetDeliveriesDropdown",
+                url: "WebServices/DeliveryUpdateService.asmx/GetDeliveriesDropdown",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (res) {
@@ -241,6 +240,10 @@
                             loadDeliveryRecord($ddl.val());
                         }
                     }
+                },
+                error: function (xhr) {
+                    console.error("Failed to load deliveries dropdown:", xhr.status, xhr.responseText);
+                    showAlert("Failed to load deliveries list. Please refresh the page.", "danger");
                 }
             });
         }
@@ -248,7 +251,7 @@
         function loadDeliveryRecord(deliveryId) {
             $.ajax({
                 type: "POST",
-                url: "DeliveryUpdateService.asmx/GetDeliveryRecord",
+                url: "WebServices/DeliveryUpdateService.asmx/GetDeliveryRecord",
                 data: JSON.stringify({ deliveryId: parseInt(deliveryId) }),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -286,7 +289,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "DeliveryUpdateService.asmx/UpdateDeliveryStatus",
+                url: "WebServices/DeliveryUpdateService.asmx/UpdateDeliveryStatus",
                 data: JSON.stringify({
                     deliveryId: parseInt(deliveryId),
                     status: status,

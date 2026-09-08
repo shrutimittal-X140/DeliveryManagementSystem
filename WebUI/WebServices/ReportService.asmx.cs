@@ -20,7 +20,6 @@ namespace WebUI.WebServices
         {
             if (HttpContext.Current.Session["UserId"] == null)
                 return new { success = false, message = "Session expired." };
-
             try
             {
                 DeliveryBLL deliveryBll = new DeliveryBLL();
@@ -35,27 +34,19 @@ namespace WebUI.WebServices
 
         [WebMethod(EnableSession = true)]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public Dictionary<string, object> UpdateRecord(int orderId, int customerId, int driverId, string customerName, string driverName, string address)
+        public object UpdateRecord(int orderId, int customerId, int driverId, string customerName, string driverName, string address)
         {
-            var result = new Dictionary<string, object>();
-
             try
             {
                 if (HttpContext.Current.Session["UserId"] == null)
                 {
-                    result["success"] = false;
-                    result["message"] = "Session expired. Please log in again.";
-                    return result;
+                    return new { success = false, message = "Session expired. Please log in again." };
                 }
-
                 if (string.IsNullOrWhiteSpace(customerName))
                 {
-                    result["success"] = false;
-                    result["message"] = "Customer Name cannot be empty.";
-                    return result;
+                    return new { success = false, message = "Customer Name cannot be empty." };
                 }
 
-           
                 if (customerId > 0)
                 {
                     SqlParameter[] custParams = new SqlParameter[]
@@ -66,7 +57,6 @@ namespace WebUI.WebServices
                     };
                     SqlHelper.ExecuteNonQuery("sp_UpdateCustomerReportInfo", custParams);
                 }
-
                 if (driverId > 0)
                 {
                     SqlParameter[] driverParams = new SqlParameter[]
@@ -76,7 +66,6 @@ namespace WebUI.WebServices
                     };
                     SqlHelper.ExecuteNonQuery("sp_UpdateDriverReportInfo", driverParams);
                 }
-
                 if (orderId > 0)
                 {
                     SqlParameter[] deliveryParams = new SqlParameter[]
@@ -87,15 +76,11 @@ namespace WebUI.WebServices
                     SqlHelper.ExecuteNonQuery("sp_UpdateDeliveryAddress", deliveryParams);
                 }
 
-                result["success"] = true;
-                result["message"] = "Record updated successfully.";
-                return result;
+                return new { success = true, message = "Record updated successfully." };
             }
             catch (Exception ex)
             {
-                result["success"] = false;
-                result["message"] = "SQL/C# EXCEPTION: " + (ex.InnerException != null ? ex.InnerException.Message : ex.Message);
-                return result;
+                return new { success = false, message = "SQL/C# EXCEPTION: " + (ex.InnerException != null ? ex.InnerException.Message : ex.Message) };
             }
         }
     }

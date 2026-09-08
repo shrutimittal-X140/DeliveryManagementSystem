@@ -199,40 +199,40 @@
         }
 
         function saveReportUpdate() {
-            var payload = JSON.stringify({
+            var payload = {
                 orderId: parseInt(document.getElementById('modalOrderId').value) || 0,
                 customerId: parseInt(document.getElementById('modalCustomerId').value) || 0,
                 driverId: parseInt(document.getElementById('modalDriverId').value) || 0,
                 customerName: $.trim($('#modalCustomerName').val()),
                 driverName: $.trim($('#modalDriverName').val()),
                 address: $.trim($('#modalAddress').val())
-            });
+            };
 
             $.ajax({
                 type: "POST",
                 url: "WebServices/ReportService.asmx/UpdateRecord",
                 data: JSON.stringify(payload),
-                contentType: "application/json ; charset = utf-8",
+                contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
                     var data = response.hasOwnProperty('d') ? response.d : response;
                     if (data.success) {
-                        alert('record updated successfully');
+                        alert('Record updated successfully');
                         location.reload();
                     } else {
-                        alert('server Response:' + data.message);
+                        alert('Server response: ' + data.message);
                     }
                 },
                 error: function (xhr, status, error) {
-                    var errDetail = "HTTP" + xhr.status + " - " + error;
+                    var errDetail = "HTTP " + xhr.status + " - " + error;
                     if (xhr.responseJSON && xhr.responseJSON.Message) {
                         errDetail += "\nDetails: " + xhr.responseJSON.Message;
                     } else if (xhr.responseText) {
-                        errorDetail += "\nRaw Error: " + xhr.responseText.substring(0, 300);
+                        errDetail += "\nRaw Error: " + xhr.responseText.substring(0, 300);
                     }
                     alert("Error: " + errDetail);
                 }
             });
-        }                
+        }               
     </script>
 </asp:Content>
