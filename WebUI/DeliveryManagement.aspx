@@ -281,6 +281,67 @@
         </div>
 
     </form>
+
+    <!-- View Delivery Details Modal -->
+<div class="modal fade" id="viewDeliveryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px;">
+            <div class="modal-header" style="border-bottom: 1px solid var(--card-border);">
+                <h5 class="modal-title text-white fw-bold">
+                    <i class="fa-solid fa-circle-info text-success me-2"></i>Delivery Details <span id="viewDeliveryNumber" class="text-success"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="form-label mb-1">Delivery Date</div>
+                        <div class="text-white fw-semibold" id="viewDate">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-label mb-1">Customer</div>
+                        <div class="text-white fw-semibold" id="viewCustomer">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-label mb-1">Assigned Driver</div>
+                        <div class="text-white fw-semibold" id="viewDriver">-</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-label mb-1">Current Status</div>
+                        <div id="viewStatus">-</div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-label mb-1">Delivery Address</div>
+                        <div class="text-white" id="viewAddress">-</div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-label mb-1">Delivery Notes</div>
+                        <div class="text-white" id="viewNotes">-</div>
+                    </div>
+                </div>
+
+                <h6 class="text-white fw-bold mb-3"><i class="fa-solid fa-list-check me-2 text-success"></i>Delivery Items</h6>
+                <div class="table-responsive">
+                    <table class="table table-dark-custom">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="viewItemsBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid var(--card-border);">
+                <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-emerald" id="btnViewToEdit">Edit This Delivery</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
@@ -294,20 +355,34 @@
     function loadDropdownsOnly() {
         $.ajax({
             type: "POST",
-            url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/GetInitialData") %>',
+            url: "WebServices/DeliveryUpdateService.asmx/GetDeliveriesDropdown",
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            success: function (response) {
-                var res = response.d;
-                if (!res.success) {
-                    alert("Error loading data: " + res.message);
+            success: function (res) {
+                var r = res.d;
+                if (r.redirect) {
+                    window.location.href = "Login.aspx";
                     return;
                 }
-                populateDropdown($('#<%= ddlCustomer.ClientID %>'), res.customers, "CustomerId", "CustomerName");
-                populateDropdown($('#<%= ddlDriver.ClientID %>'), res.drivers, "DriverId", "DriverName");
+                if (r.success) {
+                    var $ddl = $('#ddlDeliveries');
+                    $ddl.empty();
+                    $.each(r.data, function (i, item) {
+                        $ddl.append($('<option>', { value: item.Value, text: item.Text }))
+                    });
+
+                    if (selectDeliveryId > 0) {
+                        $ddl.val(selectDeliveryId);
+                    }
+
+                    if ($ddl.val()) {
+                        loadDeliveryRecord($ddl.val());
+                    }
+                }
             },
             error: function (xhr) {
-                console.error("AJAX Error details: ", xhr.responseText);
+                console.error("Failed to load deliveries dropdown:", xhr.status, xhr.responseText);
+                showAlert("Failed to load deliveries list. Please refresh the page.", "danger");
             }
         });
     }
@@ -423,8 +498,9 @@
 
     function deliveryActionsFormatter(value, row, index) {
         var deliveryId = value;
-        return '<button type="button" class="btn btn-sm btn-outline-info me-1" onclick="loadDeliveryForEdit(' + deliveryId + ')"><i class="fa-solid fa-pen-to-square"></i></button>' +
-            '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteDeliveryRecord(' + deliveryId + ')"><i class="fa-solid fa-trash-can"></i></button>';
+        return '<button type="button" class="btn btn-sm btn-outline-success me-1" onclick="viewDeliveryDetails(' + deliveryId + ')" title="View Details"><i class="fa-solid fa-eye"></i></button>' +
+            '<button type="button" class="btn btn-sm btn-outline-info me-1" onclick="loadDeliveryForEdit(' + deliveryId + ')" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>' +
+            '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteDeliveryRecord(' + deliveryId + ')" title="Delete"><i class="fa-solid fa-trash-can"></i></button>';
     }
 
     function loadDeliveryForEdit(deliveryId) {
@@ -465,6 +541,62 @@
             }
         });
     }
+
+    var currentViewDeliveryId = 0;
+    function viewDeliveryDetails(deliveryId) {
+        $.ajax({
+            type: "POST",
+            url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/LoadDelivery") %>',
+            data: JSON.stringify({ deliveryId: deliveryId }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                var res = response.d;
+                if (!res.success) {
+                    alert("Could not load details : " + res.message);
+                    return;
+                }
+
+                currentViewDeliveryId = deliveryId;
+
+                $('#viewDeliveryNumber').text('#' + res.message);
+                $('#viewDate').text(res.master.DeliveryDate || '-');
+                $('#viewAddress').text(res.master.DeliveryAddress || '-');
+                $('#viewNotes').text(res.master.DeliveryNotes || 'No notes recorded');
+                $('#viewStatus').html(statusFormatter(res.master.CurrentStatus));
+
+                var custOption = $('#<%= ddlCustomer.ClientID %> option[value="' + res.master.CustomerId + '"]');
+                $('#viewCustomer').text(custOption.length ? custOption.text() : res.master.CustomerId);
+
+                var driverOption = $('#<%= ddlDriver.ClientID %> option[value="' + res.master.DriverId + '"]');
+                $('#viewDriver').text(driverOption.length ? driverOption.text() : res.master.DriverId);
+
+                var itemsBody = $('#viewItemsBody');
+                itemsBody.empty();
+                if (res.items && res.items.length > 0) {
+                    $.each(res.items, function (index, item) {
+                        itemsBody.append('<tr><td>' + (item.ItemCode || '-') + '</td><td>' + (item.ItemName || '-') + '</td> <td>' + (item.Quantity || '-') + '</td></tr>');
+                    });
+                } else {
+                    itemsBody.append('<tr><td colspan= "3" class= "text-center text-muted"> No items recorded </td></tr>');
+                }
+
+                var modal = new bootstrap.Modal(document.getElementById('viewDeliveryModal'));
+                modal.show();
+            },
+            error: function (xhr) {
+                console.error(xhr.responseText);
+                alert("Error communicating with service while loading delivery profile.");
+            }
+        });
+    }
+
+    $(document).on('click', '#btnViewToEdit', function () {
+        var modalEl = document.getElementById('viewDeliveryModal');
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+        loadDeliveryForEdit(currentViewDeliveryId);
+    })
 
     function deleteDeliveryRecord(deliveryId) {
         if (confirm("Are you sure you want to completely erase delivery data profile #" + deliveryId + "?")) {

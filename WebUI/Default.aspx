@@ -77,25 +77,73 @@
         .feature-card {
             background-color: #13192e;
             border: 1px solid #1e293b;
+            border-top: 3px solid #22c55e;
             border-radius: 14px;
             padding: 1.75rem;
             height: 100%;
+            display: flex;
+            flex-direction: column;
             transition: all 0.3s ease;
         }
 
         .feature-card:hover {
             border-color: #22c55e;
             transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(34, 197, 94, 0.12);
+        }
+
+        .feature-icon-badge {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            background: rgba(34, 197, 94, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            color: #22c55e;
         }
 
         .module-badge {
             background: rgba(34, 197, 94, 0.1);
             color: #22c55e;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
-            padding: 0.25rem 0.6rem;
-            border-radius: 4px;
+            padding: 0.3rem 0.65rem;
+            border-radius: 5px;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .feature-card-title {
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.15rem;
+            margin: 1rem 0 0.6rem 0;
+        }
+
+        .feature-card-desc {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            line-height: 1.55;
+            flex-grow: 1;
+            margin-bottom: 1.25rem;
+        }
+
+        .feature-card-link {
+            color: #22c55e;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: gap 0.2s ease;
+        }
+
+        .feature-card-link:hover {
+            color: #4ade80;
+            gap: 0.65rem;
         }
 
         .hero-graphic-badge {
@@ -224,7 +272,7 @@
   
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function () {
-           
+
             var pending = parseInt(document.getElementById('<%= hfPending.ClientID %>').value) || 0;
             var ofd = parseInt(document.getElementById('<%= hfOFD.ClientID %>').value) || 0;
             var delivered = parseInt(document.getElementById('<%= hfDelivered.ClientID %>').value) || 0;
@@ -234,7 +282,7 @@
             var totalCustomers = parseInt(document.getElementById('<%= hfTotalCustomers.ClientID %>').value) || 0;
             var totalDeliveries = pending + ofd + delivered + failed;
 
-          
+
             var ctxStatus = document.getElementById('chartDeliveryStatus').getContext('2d');
             new Chart(ctxStatus, {
                 type: 'doughnut',
@@ -315,78 +363,73 @@
 
     <!-- ERP System Modules Cards -->
     <div class="row g-4 mb-5">
-        <!-- Module 2 -->
-        <div class="col-md-4">
+        <div class="col-lg-4 col-md-6">
             <div class="feature-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-items-start">
                     <span class="module-badge">Module 2</span>
-                    <i class="fa-solid fa-chart-pie text-success fs-4"></i>
+                    <div class="feature-icon-badge"><i class="fa-solid fa-chart-pie"></i></div>
                 </div>
-                <h5 class="fw-bold text-white">Dashboard Overview</h5>
-                <p class="text-secondary small mb-3">
+                <h5 class="feature-card-title">Dashboard Overview</h5>
+                <p class="feature-card-desc">
                     Summary metrics for Total Deliveries, Pending, Out for Delivery, Delivered, and Failed Deliveries with Bootstrap Table recent delivery logs.
                 </p>
-                <a href="Dashboard.aspx" class="text-success small fw-bold text-decoration-none">Open Dashboard &rarr;</a>
+                <a href="Dashboard.aspx" class="feature-card-link">Open Dashboard <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </div>
 
-        <!-- Module 3 -->
-        <div class="col-md-4">
+        <div class="col-lg-4 col-md-6">
             <div class="feature-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-items-start">
                     <span class="module-badge">Module 3</span>
-                    <i class="fa-solid fa-id-card text-success fs-4"></i>
+                    <div class="feature-icon-badge"><i class="fa-solid fa-id-card"></i></div>
                 </div>
-                <h5 class="fw-bold text-white">Driver Directory</h5>
-                <p class="text-secondary small mb-3">
+                <h5 class="feature-card-title">Driver Directory</h5>
+                <p class="feature-card-desc">
                     Register drivers with Driver Code, Name, Phone, Email, Vehicle Number, and Active Status. Search, activate/deactivate, and manage drivers.
                 </p>
-                <a href="DriverManagement.aspx" class="text-success small fw-bold text-decoration-none">Manage Drivers &rarr;</a>
+                <a href="DriverManagement.aspx" class="feature-card-link">Manage Drivers <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </div>
 
-        <!-- Module 4 -->
-        <div class="col-md-4">
+        <div class="col-lg-4 col-md-6">
             <div class="feature-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-items-start">
                     <span class="module-badge">Module 4</span>
-                    <i class="fa-solid fa-users text-success fs-4"></i>
+                    <div class="feature-icon-badge"><i class="fa-solid fa-users"></i></div>
                 </div>
-                <h5 class="fw-bold text-white">Customer CRM</h5>
-                <p class="text-secondary small mb-3">
+                <h5 class="feature-card-title">Customer CRM</h5>
+                <p class="feature-card-desc">
                     Maintain Customer Code, Contact Person, Phone, Email, and Delivery Address records using interactive Bootstrap Tables.
                 </p>
-                <a href="CustomerManagement.aspx" class="text-success small fw-bold text-decoration-none">Manage Customers &rarr;</a>
+                <a href="CustomerManagement.aspx" class="feature-card-link">Manage Customers <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </div>
 
-        <!-- Modules 5 & 6 -->
-        <div class="col-md-6">
+        <div class="col-lg-4 col-md-6">
             <div class="feature-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-items-start">
                     <span class="module-badge">Module 5 & 6</span>
-                    <i class="fa-solid fa-boxes-stacked text-success fs-4"></i>
+                    <div class="feature-icon-badge"><i class="fa-solid fa-boxes-stacked"></i></div>
                 </div>
-                <h5 class="fw-bold text-white">Delivery Orders & Status Workflow</h5>
-                <p class="text-secondary small mb-3">
+                <h5 class="feature-card-title">Delivery Orders & Status Workflow</h5>
+                <p class="feature-card-desc">
                     Auto-generate Delivery Numbers, assign active drivers, manage multi-item dispatches, and enforce workflow transitions (Pending &rarr; Out For Delivery &rarr; Delivered / Failed).
                 </p>
-                <a href="DeliveryManagement.aspx" class="text-success small fw-bold text-decoration-none">Manage Dispatches &rarr;</a>
+                <a href="DeliveryManagement.aspx" class="feature-card-link">Manage Dispatches <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </div>
 
-        <!-- Modules 7 & 8 -->
-        <div class="col-md-6">
+        <div class="col-lg-4 col-md-6">
             <div class="feature-card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-items-start">
                     <span class="module-badge">Module 7 & 8</span>
-                    <i class="fa-solid fa-clock-rotate-left text-success fs-4"></i>
+                    <div class="feature-icon-badge"><i class="fa-solid fa-clock-rotate-left"></i></div>
                 </div>
-                <h5 class="fw-bold text-white">Search, Reports & Audit Logs</h5>
-                <p class="text-secondary small mb-3">
+                <h5 class="feature-card-title">Search, Reports & Audit Logs</h5>
+                <p class="feature-card-desc">
                     Filter dispatches by Customer, Driver, Date Range, or Status. View complete audit history tracking status updates, timestamped user actions, and driver changes.
                 </p>
-                <a href="SearchReports.aspx" class="text-success small fw-bold text-decoration-none">View Reports & Logs &rarr;</a>
+                <a href="SearchReports.aspx" class="feature-card-link">View Reports & Logs <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </div>
     </div>

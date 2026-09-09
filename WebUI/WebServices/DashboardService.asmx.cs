@@ -60,13 +60,13 @@ namespace WebUI.WebServices
 
                     recentDeliveries.Add(new
                     {
-                        DeliveryNo = "DEL-" + row["OrderId"].ToString(),
-                        CustomerName = row["CustomerName"].ToString(),
+                        DeliveryNo = "Del-" + row["OrderId"].ToString(),
+                        CustomerName = string.IsNullOrWhiteSpace(row["CustomerName"]?.ToString()) ? "N/A" : row["CustomerName"].ToString(),
                         DriverName = string.IsNullOrWhiteSpace(row["DriverName"].ToString()) ? "Unassigned" : row["DriverName"].ToString(),
-                        DeliveryDate = row["CreatedDate"] == DBNull.Value ? "" : Convert.ToDateTime(row["CreatedDate"]).ToString("dd-MMM-yyyy"),
+                        DeliveryDate = row["CreatedDate"] == DBNull.Value ? "" : Convert.ToDateTime(row["CreatedDate"]).ToString("dd-MM-yyyy"),
                         Address = row["DeliveryAddress"].ToString(),
                         CurrentStatus = row["CurrentStatus"].ToString()
-                    });
+                    }) ;
                     count++;
                 }
 
