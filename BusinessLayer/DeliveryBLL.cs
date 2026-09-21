@@ -39,34 +39,34 @@ namespace BusinessLayer
             using (SqlConnection conn = new SqlConnection(connStr))
             {
                 string query = @"
-                    SELECT 
-                        d.DeliveryId AS OrderId,
-                        d.CustomerId,
-                        d.DriverId,
-                        c.CustomerName,
-                        dr.DriverName,
-                        d.DeliveryAddress,
-                        d.CreatedDate,
-                        d.CurrentStatus
-                    FROM Deliveries d
-                    LEFT JOIN Customers c ON d.CustomerId = c.CustomerId
-                    LEFT JOIN Drivers dr ON d.DriverId = dr.DriverId
-                    WHERE (@CurrentStatus = '' OR d.CurrentStatus = @CurrentStatus)
-                      AND (@Keyword = ''
-                           OR c.CustomerName LIKE '%' + @Keyword + '%'
-                           OR dr.DriverName LIKE '%' + @Keyword + '%'
-                           OR c.DeliveryAddress LIKE '%' + @Keyword + '%')";
+                          SELECT
+                               d.DeliveryId AS OrderId,
+                               d.CustomerId,
+                               d.DriverId,
+                               c.CustomerName,
+                               dr.DriverName,
+                               d.DeliveryAddress,
+                               d.CreatedDate,
+                               d.CurrentStatus
+                          FROM Deliveries d
+                          LEFT JOIN Customers c ON d.CustomerId = c.CustomerId
+                          LEFT JOIN Drivers dr ON d.DriverId = dr.DriverId
+                          WHERE (@CurrentStatus = '' OR LOWER(RTRIM(LTRIM(d.CurrentStatus))) = LOWER(RTRIM(LTRIM(@CurrentStatus))))
+                              AND (@Keyword = '' 
+                                   OR c.CustomerName LIKE '%' + @Keyword + '%' 
+                                   OR dr.DriverName LIKE '%' + @Keyword + '%'
+                                   OR d.DeliveryAddress LIKE '%' + @Keyword + '%'
+                                   OR CAST(d.DeliveryId AS NVARCHAR) LIKE '%' + @Keyword + '%')";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@CurrentStatus", status ?? string.Empty);
-                    cmd.Parameters.AddWithValue("@Keyword", keyword ?? string.Empty);
+                    cmd.Parameters.AddWithValue("@CurrentStatus", (status ?? string.Empty).Trim());
+                    cmd.Parameters.AddWithValue("@Keyword", (keyword ?? string.Empty).Trim());
 
                     conn.Open();
                     SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                     adapter.Fill(dt);
                 }
-
             }
             return dt;
         }
@@ -116,25 +116,26 @@ namespace BusinessLayer
         }
 
         public PagedResult GetDeliveriesPaged(int currentUserId, bool isSuperAdmin, string searchTerm,
-     string sortColumn, string sortDirection, int pageNumber, int pageSize)
+            string sortColumn, string sortDirection, int pageNumber, int pageSize)
         {
             SqlParameter totalOut = new SqlParameter("@TotalCount", SqlDbType.Int) { Direction = ParameterDirection.Output };
 
             SqlParameter[] parameters = {
-        new SqlParameter("@CurrentUserId", currentUserId),
-        new SqlParameter("@IsSuperAdmin", isSuperAdmin),
-        new SqlParameter("@SearchTerm", (object)searchTerm ?? string.Empty),
-        new SqlParameter("@SortColumn", (object)sortColumn ?? "DeliveryId"),
-        new SqlParameter("@SortDirection", (object)sortDirection ?? "DESC"),
-        new SqlParameter("@PageNumber", pageNumber),
-        new SqlParameter("@PageSize", pageSize),
-        totalOut
-    };
+                new SqlParameter("@CurrentUserId", currentUserId),
+                new SqlParameter("@IsSuperAdmin", isSuperAdmin),
+                new SqlParameter("@SearchTerm", (object)searchTerm ?? string.Empty),
+                new SqlParameter("@SortColumn", (object)sortColumn ?? "DeliveryId"),
+                new SqlParameter("@SortDirection", (object)sortDirection ?? "DESC"),
+                new SqlParameter("@PageNumber", pageNumber),
+                new SqlParameter("@PageSize", pageSize),
+                totalOut
+            };
 
             DataTable dt = SqlHelper.ExecuteDataTable("sp_GetDeliveriesPaged", parameters);
 
             return new PagedResult { Rows = dt, Total = totalOut.Value != DBNull.Value ? Convert.ToInt32(totalOut.Value) : 0 };
         }
+
         public SaveDeliveryResult SaveDeliveryWithItems(
             int deliveryId, DateTime deliveryDate, int customerId, int driverId,
             string address, string notes, string status,
@@ -216,10 +217,13 @@ namespace BusinessLayer
             }
         }
 
-        public int UpdateDeliveryStatus(int deliveryId, string status, DbTransactionContext ctx = null)
+        public UpdateStatusResult UpdateDeliveryStatus(int deliveryId, string status, DbTransactionContext ctx = null)
         {
             bool ownsTransaction = (ctx == null);
             if (ownsTransaction) ctx = new DbTransactionContext();
+
+            bool emailSent = false;
+            string emailMessage = null;
 
             try
             {
@@ -231,7 +235,40 @@ namespace BusinessLayer
                 int rows = SqlHelper.ExecuteNonQuery("sp_UpdateDeliveryStatus", parameters, ctx);
 
                 if (ownsTransaction) ctx.Commit();
-                return rows;
+
+                if (status.Equals("Delivered", StringComparison.OrdinalIgnoreCase))
+                {
+                    DataTable dt = GetDeliveryById(deliveryId);
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow row = dt.Rows[0];
+                        string email = dt.Columns.Contains("CustomerEmail") && row["CustomerEmail"] != DBNull.Value
+                            ? row["CustomerEmail"].ToString() : "";
+                        string custName = row["CustomerName"] != DBNull.Value ? row["CustomerName"].ToString() : "Customer";
+
+                        if (!string.IsNullOrWhiteSpace(email))
+                        {
+                            var emailResult = EmailService.SendDeliveryNotificationAsync(email, custName, deliveryId)
+                                            .GetAwaiter().GetResult();
+                            emailSent = emailResult.Success;
+
+                            emailMessage = emailSent
+                                ? $"Notification email sent to {email}."
+                                : $"Status updated, but email failed: {emailResult.Error}";
+                        } 
+                        else
+                        {
+                            emailMessage = "Status updated, but this customer has no email on file.";
+                        }
+                    }
+                }
+
+                return new UpdateStatusResult
+                {
+                    RowsAffected = rows,
+                    EmailSent = emailSent,
+                    Message = emailMessage
+                };
             }
             catch
             {
@@ -243,6 +280,46 @@ namespace BusinessLayer
                 if (ownsTransaction) ctx.Dispose();
             }
         }
+
+        public DataTable TrackDelivery(int deliveryId)
+        {
+            SqlParameter[] parameters = { new SqlParameter("@DeliveryId", deliveryId) };
+            return SqlHelper.ExecuteDataTable("sp_TrackDeliveryPublic", parameters);
+        }
+
+        public DataTable GetDriverWorkload()
+        {
+            return SqlHelper.ExecuteDataTable("sp_GetDriverWorkload");
+        }
+        public CustomerDto GetCustomerById(int customerId)
+        {
+            SqlParameter[] parameters =
+            {
+                new SqlParameter("@CustomerId", customerId)
+            };
+
+            DataTable dt = SqlHelper.ExecuteDataTable("sp_GetCustomerById", parameters);
+
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                DataRow row = dt.Rows[0];
+                return new CustomerDto
+                {
+                    CustomerId = Convert.ToInt32(row["CustomerId"]),
+                    Name = dt.Columns.Contains("CustomerName") ? row["CustomerName"].ToString() : row["Name"].ToString(),
+                    Email = dt.Columns.Contains("CustomerEmail") ? row["CustomerEmail"].ToString() : row["Email"].ToString()
+                };
+            }
+
+            return null;
+        }
+    } 
+
+    public class CustomerDto
+    {
+        public int CustomerId { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
     }
 
     public class SaveDeliveryResult
@@ -255,6 +332,14 @@ namespace BusinessLayer
     public class DeleteResult
     {
         public bool Success { get; set; }
+        public string Message { get; set; }
+    }
+
+
+    public class UpdateStatusResult
+    {
+        public int RowsAffected { get; set; }
+        public bool EmailSent { get; set; }
         public string Message { get; set; }
     }
 }

@@ -137,6 +137,9 @@
     <Content Include="Default.aspx" />
     <Content Include="DeliveryManagement.aspx" />
     <Content Include="DeliveryUpdate.aspx" />
+    <Content Include="DriverWorkload.aspx" />
+    <Content Include="ItemManagement.aspx" />
+    <Content Include="TrackDelivery.aspx" />
     <Content Include="WebServices\DeliveryUpdateService.asmx" />
     <Content Include="DriverManagement.aspx" />
     <Content Include="favicon.ico" />
@@ -179,6 +182,7 @@
     <Content Include="WebServices\DashboardService.asmx" />
     <Content Include="WebServices\DeliveryService.asmx" />
     <Content Include="WebServices\DriverService.asmx" />
+    <Content Include="WebServices\ItemService.asmx" />
     <Content Include="WebServices\ReportService.asmx" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -254,6 +258,27 @@
     </Compile>
     <Compile Include="DeliveryUpdate.aspx.designer.cs">
       <DependentUpon>DeliveryUpdate.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DriverWorkload.aspx.cs">
+      <DependentUpon>DriverWorkload.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="DriverWorkload.aspx.designer.cs">
+      <DependentUpon>DriverWorkload.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ItemManagement.aspx.cs">
+      <DependentUpon>ItemManagement.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ItemManagement.aspx.designer.cs">
+      <DependentUpon>ItemManagement.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="TrackDelivery.aspx.cs">
+      <DependentUpon>TrackDelivery.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TrackDelivery.aspx.designer.cs">
+      <DependentUpon>TrackDelivery.aspx</DependentUpon>
     </Compile>
     <Compile Include="WebServices\DeliveryUpdateService.asmx.cs">
       <DependentUpon>DeliveryUpdateService.asmx</DependentUpon>
@@ -339,6 +364,10 @@
     </Compile>
     <Compile Include="WebServices\DriverService.asmx.cs">
       <DependentUpon>DriverService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WebServices\ItemService.asmx.cs">
+      <DependentUpon>ItemService.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="WebServices\ReportService.asmx.cs">

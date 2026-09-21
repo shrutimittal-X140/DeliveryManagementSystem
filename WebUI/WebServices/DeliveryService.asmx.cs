@@ -7,6 +7,11 @@ using System.Web.Script.Services;
 using BusinessLayer;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
+using static BusinessLayer.CustomerBLL;
+using System.Web.Management;
+using System.Linq.Expressions;
+using System.Configuration;
 
 namespace WebUI.WebServices
 {
@@ -27,6 +32,8 @@ namespace WebUI.WebServices
 
             return cleanedRole.Equals("SuperAdmin", StringComparison.OrdinalIgnoreCase) ||
                    cleanedRole.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+
+
 
         }
 
@@ -113,80 +120,189 @@ namespace WebUI.WebServices
         }
 
         [WebMethod(EnableSession = true)]
-        public object SaveDelivery(int deliveryId, string deliveryDate, int customerId, int driverId, string address, string notes, string status, List<DeliveryItemInput> items)
-        {
-            if (CurrentUserId() == 0) return new { success = false, message = "Session expired. Please log in again." };
-
-            DataTable dtItems = new DataTable();
-            dtItems.Columns.Add("ItemCode", typeof(string));
-            dtItems.Columns.Add("ItemName", typeof(string));
-            dtItems.Columns.Add("Quantity", typeof(int));
-
-            if (items != null)
-            {
-                foreach (var item in items)
-                {
-                    dtItems.Rows.Add(item.ItemCode, item.ItemName, item.Quantity);
-                }
-            }
-            if (dtItems.Rows.Count == 0) dtItems.Rows.Add("", "", 1);
-        
-            var result = deliveryBLL.SaveDeliveryWithItems(
-                deliveryId, Convert.ToDateTime(deliveryDate), customerId, driverId,
-                address, notes, status, dtItems, CurrentUserId(), IsSuperAdmin()
-            );
-
-            return new { success = result.Success, message = result.Message };
-        }
-        [WebMethod(EnableSession = true)]
-        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public object GetDeliveriesPaged(int limit, int offset, string sort, string order, string search)
         {
-            if (Session["UserId"] == null)
+            if (CurrentUserId() == 0)
+                return new { total = 0, rows = new object[0] };
+
+            int pageSize = limit > 0 ? limit : 10;
+            int pageNumber = (pageSize > 0 ? (offset / pageSize) : 0) + 1;
+
+            PagedResult result = deliveryBLL.GetDeliveriesPaged(
+                CurrentUserId(), IsSuperAdmin(), search,
+                string.IsNullOrWhiteSpace(sort) ? "DeliveryId" : sort,
+                string.IsNullOrWhiteSpace(order) ? "desc" : order,
+                pageNumber, pageSize
+            );
+
+            List<object> rows = new List<object>();
+            foreach (DataRow row in result.Rows.Rows)
             {
-                return new { total = 0, rows = new List<object>() };
+                rows.Add(new
+                {
+                    DeliveryId = row["DeliveryId"],
+                    DeliveryNumber = row.Table.Columns.Contains("DeliveryNumber") ? row["DeliveryNumber"]?.ToString() : "DEL-" + row["DeliveryId"],
+                    DeliveryDate = row.Table.Columns.Contains("DeliveryDate") && row["DeliveryDate"] != DBNull.Value
+                        ? Convert.ToDateTime(row["DeliveryDate"]).ToString("yyyy-MM-dd") : "",
+                    CustomerName = row.Table.Columns.Contains("CustomerName") ? row["CustomerName"]?.ToString() : "",
+                    DriverName = row.Table.Columns.Contains("DriverName") ? row["DriverName"]?.ToString() : "",
+                    DeliveryAddress = row.Table.Columns.Contains("DeliveryAddress") ? row["DeliveryAddress"]?.ToString() : "",
+                    CurrentStatus = row.Table.Columns.Contains("CurrentStatus") ? row["CurrentStatus"]?.ToString() : ""
+                });
             }
 
-            DeliveryBLL deliveryBLL = new DeliveryBLL();
-            DataTable dt = deliveryBLL.GetDeliveriesForGrid();
-
-            List<object> deliveries = new List<object>();
-           
-  
-                        foreach(DataRow dr in dt.Rows)
-                        {
-                            deliveries.Add(new
-                            {
-                                DeliveryId = Convert.ToInt32(dr["DeliveryId"]),
-                                DeliveryNumber = dr["DeliveryNumber"] != DBNull.Value ? dr["DeliveryNumber"].ToString() : "",
-                                DeliveryDate = dr["DeliveryDate"] != DBNull.Value ? Convert.ToDateTime(dr["DeliveryDate"]).ToString("yyyy-MM-dd") : "",
-                                CustomerName = dr["CustomerName"] != DBNull.Value ? dr["CustomerName"].ToString() : "N/A",
-                                DriverName = dr["DriverName"] != DBNull.Value ? dr["DriverName"].ToString() : "Unassigned",
-                                DeliveryAddress = dr["DeliveryAddress"] != DBNull.Value ? dr["DeliveryAddress"].ToString() : "",
-                                CurrentStatus = dr["CurrentStatus"] != DBNull.Value ? dr["CurrentStatus"].ToString() : ""
-                            });
-                        }
-           
-            if (!string.IsNullOrEmpty(search))
-            {
-                search = search.ToLower();
-                deliveries = deliveries.Where(x =>
-                    x.GetType().GetProperty("DeliveryNumber").GetValue(x, null).ToString().ToLower().Contains(search) ||
-                    x.GetType().GetProperty("CustomerName").GetValue(x, null).ToString().ToLower().Contains(search) ||
-                    x.GetType().GetProperty("DriverName").GetValue(x, null).ToString().ToLower().Contains(search) ||
-                    x.GetType().GetProperty("CurrentStatus").GetValue(x, null).ToString().ToLower().Contains(search)
-                ).ToList();
-            }
-            int totalCount = deliveries.Count; 
-            var pagedRows = deliveries.Skip(offset).Take(limit).ToList();
-
-            return new
-            {
-                total = totalCount,
-                rows = pagedRows
-            };
+            return new { total = result.Total, rows = rows };
         }
 
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public object TrackDelivery(int deliveryId)
+        {
+            try
+            {
+                if(deliveryId <= 0)
+                {
+                    return new  {success = false, message = "Please enter a valid Delivery ID."};
+                }
+
+                DataTable dt = deliveryBLL.TrackDelivery(deliveryId);
+                if ( dt == null || dt.Rows.Count == 0 )
+                {
+                    return new { success = false, message = "No delivery found with that ID." };
+                }
+
+                DataRow row = dt.Rows[0];
+                return new
+                {
+                    success = true,
+                    deliveryNumber = row["DeliveryNumber"].ToString(),
+                    deliveryDate = row["DeliveryDate"] != DBNull.Value ? Convert.ToDateTime(row["DeliveryDate"]).ToString("yyyy-MM-dd") : "",
+                    currentStatus = row["CurrentStatus"].ToString(),
+                    deliveryAddress = row["DeliveryAddress"]?.ToString(),
+                    customerName = row["CustomerName"]?.ToString(),
+                    driverName = row["DriverName"]?.ToString()
+                };
+            } catch (Exception ex) {
+                return new { success = false, message = "Error: " + ex.Message };
+            } 
+        }
+    [WebMethod(EnableSession = true)]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public object GetDriverWorkload()
+        {
+            if (CurrentUserId() == 0) return new { success = false, message = "Unauthorised" };
+            
+            try
+            {
+                DataTable dt = deliveryBLL.GetDriverWorkload();
+                List<object> list = new List<object>();
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    list.Add(new
+                    {
+                         DriverId = Convert.ToInt32(row["DriverId"]),
+                         DriverName = row["DriverName"].ToString(),
+                         ActiveCount = Convert.ToInt32(row["ActiveCount"]),
+                         DeliveredCount = Convert.ToInt32(row["DeliveredCount"]),
+                         TotalCount = Convert.ToInt32(row["TotalCount"])
+                    });
+                }
+                return new { success = true, data = list };
+            }
+            catch (Exception ex)
+            {
+                return new { success = false, message = ex.Message };
+            }
+
+        }
+
+        [WebMethod(EnableSession = true)]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public object SaveDelivery(int deliveryId, string deliveryDate, int customerId, int driverId, string address, string notes, string status, List<DeliveryItemDto> items)
+        {
+            try
+            {
+                int currentUserId = CurrentUserId();
+                bool isSuperAdmin = IsSuperAdmin();
+
+                DataTable dtItems = new DataTable();
+                dtItems.Columns.Add("ItemCode", typeof(string));
+                dtItems.Columns.Add("ItemName", typeof(string));
+                dtItems.Columns.Add("Quantity", typeof(int));
+
+                if (items != null)
+                {
+                    foreach (var item in items)
+                    {
+                        dtItems.Rows.Add(item.ItemCode ?? "", item.ItemName ?? "", item.Quantity);
+                    }
+                }
+
+                DateTime dateParsed = Convert.ToDateTime(deliveryDate);
+
+                SaveDeliveryResult result = deliveryBLL.SaveDeliveryWithItems(
+                    deliveryId, dateParsed, customerId, driverId, address, notes, status, dtItems, currentUserId, isSuperAdmin
+                );
+
+                if (!result.Success)
+                {
+                    return new { success = false, message = result.Message };
+                }
+
+                string flashMessage = "Delivery saved successfully.";
+                bool emailSent = false;
+
+                if (status.Equals("Delivered", StringComparison.OrdinalIgnoreCase))
+                {
+                    var customer = deliveryBLL.GetCustomerById(customerId);
+
+                    if (customer != null && !string.IsNullOrEmpty(customer.Email))
+                    {
+                        var emailResult = Task.Run(() => EmailService.SendDeliveryNotificationAsync(customer.Email, customer.Name, result.DeliveryId)).Result;
+                        emailSent = emailResult.Success;
+
+                        flashMessage = emailSent
+                            ? $"Delivery marked as Delivered. Notification email sent to {customer.Email}."
+                            : $"Delivery saved as Delivered, but email failed: {emailResult.Error}";
+                    }
+                    else
+                    {
+                        flashMessage = "Delivery marked as Delivered, but no valid email found for this customer.";
+                    }
+                }
+
+                return new { success = true, message = flashMessage, emailSent = emailSent, deliveryId = result.DeliveryId };
+            }
+            catch (Exception ex)
+            {
+                return new { success = false, message = "Error: " + ex.Message };
+            }
+        }
+
+        [WebMethod(EnableSession = true)]
+        public object GetAllItemsSimple()
+        {
+            if (CurrentUserId() == 0) return new { success = false, message = "Unauthorized" };
+
+            ItemBLL itemBLL = new ItemBLL();
+            DataTable dt = itemBLL.GetAllItems();
+            List<object> items = new List<object>();
+
+            foreach ( DataRow row in dt.Rows)
+            {
+                bool isActive = row.Table.Columns.Contains("IsActive") && row["IsActive"] != DBNull.Value && Convert.ToBoolean(row["IsActive"]);
+                if (!isActive) continue;
+
+                items.Add(new
+                {
+                    ItemId = Convert.ToInt32(row["ItemId"]),
+                    ItemCode = row["ItemCode"].ToString(),
+                    ItemName = row["ItemName"].ToString()
+                });  
+            }
+            return new { success = true, items = items };
+        }
 
         [WebMethod(EnableSession = true)]
         public object DeleteDelivery(int deliveryId)
@@ -197,7 +313,7 @@ namespace WebUI.WebServices
         }
     }
 
-    public class DeliveryItemInput
+    public class DeliveryItemDto
     {
         public string ItemCode { get; set; }
         public string ItemName { get; set; }

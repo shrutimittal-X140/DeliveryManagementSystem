@@ -114,38 +114,45 @@
 
         .table-dark-custom {
             width: 100% !important;
-            background-color: #111827 !important;
-            border: 1px solid #374151 !important;
-            border-radius: 6px !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--card-border) !important;
+            border-radius: 8px !important;
             overflow: hidden !important;
             margin-bottom: 0 !important;
         }
 
         .table-dark-custom th {
             background-color: #1a2332 !important;
-            color: #9ca3af !important;
+            color: var(--text-muted) !important;
             font-size: 0.8rem !important;
             font-weight: 700 !important;
             text-transform: uppercase !important;
             letter-spacing: 0.05em !important;
             padding: 12px 16px !important;
-            border-bottom: 1px solid #1f2937 !important;
-            text-align: left !important;
+            border-bottom: 1px solid var(--card-border) !important;
+            border-top: none !important;
         }
 
         .table-dark-custom td {
-            background-color: #111827 !important;
-            color: #ffffff !important;
+            background-color: var(--card-bg) !important;
+            color: var(--text-main) !important;
             padding: 12px 16px !important;
-            border-bottom: 1px solid #1f2937 !important;
+            border-bottom: 1px solid var(--card-border) !important;
             vertical-align: middle !important;
-            text-align: left !important;
         }
 
         .table-dark-custom tr:last-child td {
             border-bottom: none !important;
+        }
+
+        .table-dark-custom tbody tr:hover td {
+            background-color: #1a2332 !important;
+        }
+
+        .bootstrap-table .fixed-table-container {
+            border: 1px solid var(--card-border) !important;
+            border-radius: 8px !important;
+            background-color: var(--card-bg) !important;
         }
 
         .fixed-table-pagination .pagination-detail,
@@ -173,10 +180,69 @@
             border-radius: 6px;
         }
 
-        .badge-pending { background-color: #f59e0b; color: #000; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
-        .badge-out { background-color: #3b82f6; color: #fff; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
-        .badge-delivered { background-color: var(--accent-green); color: #000; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
-        .badge-failed { background-color: #ef4444; color: #fff; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
+        .status-pill {
+         display: inline-block !important;
+         padding: 6px 16px !important;
+         border-radius: 50px !important;
+         font-size: 0.72rem !important;
+         font-weight: 800 !important;
+         letter-spacing: 0.05em !important;
+         text-transform: uppercase !important;
+         text-align: center !important;
+         min-width: 140px !important;
+         }
+
+       .badge-pending { 
+        background-color: rgba(245, 158, 11, 0.12) !important;
+        color: #f59e0b !important;
+        border: 1px solid rgba(245, 158, 11, 0.4) !important;
+        padding: 6px 12px !important; 
+        border-radius: 20px !important; 
+        font-weight: 600 !important; 
+        font-size: 0.75rem !important;
+        display: inline-block !important;
+        text-align: center !important;
+        min-width: 110px !important;
+        }
+
+       .badge-out { 
+        background-color: rgba(14, 165, 233, 0.12) !important;
+        color: #0ea5e9 !important;
+        border: 1px solid rgba(14, 165, 233, 0.4) !important;
+        padding: 6px 12px !important; 
+        border-radius: 20px !important; 
+        font-weight: 600 !important; 
+        font-size: 0.75rem !important;
+        display: inline-block !important;
+        text-align: center !important;
+        min-width: 110px !important;
+        }
+
+       .badge-delivered { 
+        background-color: rgba(34, 197, 94, 0.12) !important;
+        color: #22c55e !important;
+        border: 1px solid rgba(34, 197, 94, 0.4) !important;
+        padding: 6px 12px !important; 
+        border-radius: 20px !important; 
+        font-weight: 600 !important; 
+        font-size: 0.75rem !important;
+        display: inline-block !important;
+        text-align: center !important;
+        min-width: 110px !important;
+        }
+
+       .badge-failed { 
+        background-color: rgba(239, 68, 68, 0.12) !important;
+        color: #ef4444 !important; 
+        border: 1px solid rgba(239, 68, 68, 0.4) !important;
+        padding: 6px 12px !important; 
+        border-radius: 20px !important; 
+        font-weight: 600 !important; 
+        font-size: 0.75rem !important;
+        display: inline-block !important;
+        text-align: center !important;
+        min-width: 110px !important;
+        }
     </style>
 </head>
 <body>
@@ -255,10 +321,11 @@
                         <table id="tblItems" class="table table-dark-custom">
                             <thead>
                                 <tr>
-                                    <th style="width: 30%;">Item Code</th>
-                                    <th style="width: 45%;">Item Name</th>
-                                    <th style="width: 15%;">Quantity</th>
-                                    <th style="width: 10%;">Action</th>
+                                    <th style= "width: 22%;"> Select Item </th>
+                                    <th style =" width: 22%;"> Item Code</th>
+                                    <th style ="width: 33%;"> Item Name</th>
+                                    <th style ="width:13%;"> Quantity</th>
+                                    <th style =" width: 10%;" class="text-center"> Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -283,439 +350,517 @@
     </form>
 
     <!-- View Delivery Details Modal -->
-<div class="modal fade" id="viewDeliveryModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content" style="background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px;">
-            <div class="modal-header" style="border-bottom: 1px solid var(--card-border);">
-                <h5 class="modal-title text-white fw-bold">
-                    <i class="fa-solid fa-circle-info text-success me-2"></i>Delivery Details <span id="viewDeliveryNumber" class="text-success"></span>
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <div class="form-label mb-1">Delivery Date</div>
-                        <div class="text-white fw-semibold" id="viewDate">-</div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-label mb-1">Customer</div>
-                        <div class="text-white fw-semibold" id="viewCustomer">-</div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-label mb-1">Assigned Driver</div>
-                        <div class="text-white fw-semibold" id="viewDriver">-</div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-label mb-1">Current Status</div>
-                        <div id="viewStatus">-</div>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="form-label mb-1">Delivery Address</div>
-                        <div class="text-white" id="viewAddress">-</div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-label mb-1">Delivery Notes</div>
-                        <div class="text-white" id="viewNotes">-</div>
-                    </div>
+    <div class="modal fade" id="viewDeliveryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px;">
+                <div class="modal-header" style="border-bottom: 1px solid var(--card-border);">
+                    <h5 class="modal-title text-white fw-bold">
+                        <i class="fa-solid fa-circle-info text-success me-2"></i>Delivery Details <span id="viewDeliveryNumber" class="text-success"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <div class="modal-body p-4">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="form-label mb-1">Delivery Date</div>
+                            <div class="text-white fw-semibold" id="viewDate">-</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-label mb-1">Customer</div>
+                            <div class="text-white fw-semibold" id="viewCustomer">-</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-label mb-1">Assigned Driver</div>
+                            <div class="text-white fw-semibold" id="viewDriver">-</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-label mb-1">Current Status</div>
+                            <div id="viewStatus">-</div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="form-label mb-1">Delivery Address</div>
+                            <div class="text-white" id="viewAddress">-</div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-label mb-1">Delivery Notes</div>
+                            <div class="text-white" id="viewNotes">-</div>
+                        </div>
+                    </div>
 
-                <h6 class="text-white fw-bold mb-3"><i class="fa-solid fa-list-check me-2 text-success"></i>Delivery Items</h6>
-                <div class="table-responsive">
-                    <table class="table table-dark-custom">
-                        <thead>
-                            <tr>
-                                <th>Item Code</th>
-                                <th>Item Name</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody id="viewItemsBody">
-                        </tbody>
-                    </table>
+                    <h6 class="text-white fw-bold mb-3"><i class="fa-solid fa-list-check me-2 text-success"></i>Delivery Items</h6>
+                    <div class="table-responsive">
+                        <table class="table table-dark-custom">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viewItemsBody">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer" style="border-top: 1px solid var(--card-border);">
-                <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-emerald" id="btnViewToEdit">Edit This Delivery</button>
+                <div class="modal-footer" style="border-top: 1px solid var(--card-border);">
+                    <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-emerald" id="btnViewToEdit">Edit This Delivery</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
-<script type="text/javascript">
-    $(document).ready(function () {
-        loadDropdownsOnly();
-        addNewItemRow();
-        initDeliveriesTable();
-    });
 
-    function loadDropdownsOnly() {
-        $.ajax({
-            type: "POST",
-            url: "WebServices/DeliveryUpdateService.asmx/GetDeliveriesDropdown",
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (res) {
-                var r = res.d;
-                if (r.redirect) {
-                    window.location.href = "Login.aspx";
-                    return;
-                }
-                if (r.success) {
-                    var $ddl = $('#ddlDeliveries');
-                    $ddl.empty();
-                    $.each(r.data, function (i, item) {
-                        $ddl.append($('<option>', { value: item.Value, text: item.Text }))
-                    });
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.22.1/dist/bootstrap-table.min.js"></script>
+    <script type="text/javascript">
 
-                    if (selectDeliveryId > 0) {
-                        $ddl.val(selectDeliveryId);
-                    }
+        var allCatalogItems = [];
 
-                    if ($ddl.val()) {
-                        loadDeliveryRecord($ddl.val());
-                    }
-                }
-            },
-            error: function (xhr) {
-                console.error("Failed to load deliveries dropdown:", xhr.status, xhr.responseText);
-                showAlert("Failed to load deliveries list. Please refresh the page.", "danger");
-            }
+        $(document).ready(function () {
+            loadInitialDropdowns();
+            loadCatalogItems();
+            addNewItemRow();
+            initDeliveriesTable();
         });
-    }
 
-    function populateDropdown(selectEl, items, valueField, textField) {
-        var currentVal = selectEl.val();
-        selectEl.empty();
-        selectEl.append('<option value="">-- Select --</option>');
-        $.each(items, function (i, item) {
-            selectEl.append(`<option value="${item[valueField]}">${item[textField]}</option>`);
-        });
-        if (currentVal) selectEl.val(currentVal);
-    }
-
-    function initDeliveriesTable() {
-        $('#tblDeliveries').bootstrapTable('destroy').bootstrapTable({
-            cache: false,
-            method: 'post',
-            contentType: "application/json; charset=utf-8",
-            ajax: deliveryTableAjax,
-            sidePagination: 'server',
-            pagination: true,
-            pageSize: 10,
-            pageList: [10, 25, 50, 100],
-            sortName: 'DeliveryId',
-            sortOrder: 'desc',
-            search: true,
-            columns: [{
-                field: 'DeliveryId',
-                title: 'Delivery ID',
-                sortable: true
-            }, {
-                field: 'DeliveryNumber',
-                title: 'Delivery #',
-                sortable: true
-            }, {
-                field: 'DeliveryDate',
-                title: 'Date',
-                sortable: true
-            }, {
-                field: 'CustomerName',
-                title: 'Customer',
-                sortable: true
-            }, {
-                field: 'DriverName',
-                title: 'Driver',
-                sortable: false
-            }, {
-                field: 'DeliveryAddress',
-                title: 'Address',
-                sortable: false
-            }, {
-                field: 'CurrentStatus',
-                title: 'Status',
-                sortable: false,
-                formatter: statusFormatter
-            }, {
-                field: 'DeliveryId',
-                title: 'Actions',
-                escape: false,
-                formatter: deliveryActionsFormatter
-            }]
-        });
-    }
-
-    function deliveryTableAjax(params) {
-        $.ajax({
-            type: "POST",
-            url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/GetDeliveriesPaged") %>',
-        data: JSON.stringify({
-            limit: params.data.limit || 10,
-            offset: params.data.offset || 0,
-            sort: params.data.sort || "DeliveryId",
-            order: params.data.order || "desc",
-            search: params.data.search || ""
-        }),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (response) {
-            var data = response.d ? response.d : response;
-            if (typeof data === 'string') {
-                data = JSON.parse(data);
-            }
-            if (Array.isArray(data)) {
-                params.success({
-                    total: data.length,
-                    rows: data
-                });
-            } else {
-                params.success({
-                    total: data.total || 0,
-                    rows: data.rows || []
-                });
-            }
-        },
-        error: function (xhr) {
-            console.error("Delivery grid load failed: ", xhr.responseText);
-            params.error();
-        }
-    });
-}
-
-    function statusFormatter(value, row, index) {
-        var status = value || "";
-        var badgeClass = "badge bg-secondary";
-        var s = status.trim().toLowerCase();
-        if (s === "pending") badgeClass = "badge-pending";
-        else if (s === "out for delivery") badgeClass = "badge-out";
-        else if (s === "delivered") badgeClass = "badge-delivered";
-        else if (s === "failed") badgeClass = "badge-failed";
-        return '<span class="' + badgeClass + '">' + status + '</span>';
-    }
-
-    function deliveryActionsFormatter(value, row, index) {
-        var deliveryId = value;
-        return '<button type="button" class="btn btn-sm btn-outline-success me-1" onclick="viewDeliveryDetails(' + deliveryId + ')" title="View Details"><i class="fa-solid fa-eye"></i></button>' +
-            '<button type="button" class="btn btn-sm btn-outline-info me-1" onclick="loadDeliveryForEdit(' + deliveryId + ')" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>' +
-            '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteDeliveryRecord(' + deliveryId + ')" title="Delete"><i class="fa-solid fa-trash-can"></i></button>';
-    }
-
-    function loadDeliveryForEdit(deliveryId) {
-        $.ajax({
-            type: "POST",
-            url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/LoadDelivery") %>',
-            data: JSON.stringify({ deliveryId: deliveryId }),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (response) {
-                var res = response.d;
-                if (res.success) {
-                    $('#<%= hfDeliveryId.ClientID %>').val(res.master.DeliveryId);
-                    $('#<%= txtDeliveryDate.ClientID %>').val(res.master.DeliveryDate);
-                    $('#<%= ddlCustomer.ClientID %>').val(res.master.CustomerId);
-                    $('#<%= ddlDriver.ClientID %>').val(res.master.DriverId);
-                    $('#<%= txtAddress.ClientID %>').val(res.master.DeliveryAddress);
-                    $('#<%= txtNotes.ClientID %>').val(res.master.DeliveryNotes);
-                    $('#<%= ddlStatus.ClientID %>').val(res.master.CurrentStatus);
-
-                    $('#tblItems tbody').empty();
-                    if (res.items && res.items.length > 0) {
-                        $.each(res.items, function (index, item) {
-                            addNewItemRow(item.ItemCode, item.ItemName, item.Quantity);
-                        });
-                    } else {
-                        addNewItemRow();
-                    }
-
-                    $('html, body').animate({ scrollTop: 0 }, 'fast');
-                } else {
-                    alert("Could not load details: " + res.message);
-                }
-            },
-            error: function (xhr) {
-                console.error(xhr.responseText);
-                alert("Error communicating with service while loading delivery profile.");
-            }
-        });
-    }
-
-    var currentViewDeliveryId = 0;
-    function viewDeliveryDetails(deliveryId) {
-        $.ajax({
-            type: "POST",
-            url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/LoadDelivery") %>',
-            data: JSON.stringify({ deliveryId: deliveryId }),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (response) {
-                var res = response.d;
-                if (!res.success) {
-                    alert("Could not load details : " + res.message);
-                    return;
-                }
-
-                currentViewDeliveryId = deliveryId;
-
-                $('#viewDeliveryNumber').text('#' + res.message);
-                $('#viewDate').text(res.master.DeliveryDate || '-');
-                $('#viewAddress').text(res.master.DeliveryAddress || '-');
-                $('#viewNotes').text(res.master.DeliveryNotes || 'No notes recorded');
-                $('#viewStatus').html(statusFormatter(res.master.CurrentStatus));
-
-                var custOption = $('#<%= ddlCustomer.ClientID %> option[value="' + res.master.CustomerId + '"]');
-                $('#viewCustomer').text(custOption.length ? custOption.text() : res.master.CustomerId);
-
-                var driverOption = $('#<%= ddlDriver.ClientID %> option[value="' + res.master.DriverId + '"]');
-                $('#viewDriver').text(driverOption.length ? driverOption.text() : res.master.DriverId);
-
-                var itemsBody = $('#viewItemsBody');
-                itemsBody.empty();
-                if (res.items && res.items.length > 0) {
-                    $.each(res.items, function (index, item) {
-                        itemsBody.append('<tr><td>' + (item.ItemCode || '-') + '</td><td>' + (item.ItemName || '-') + '</td> <td>' + (item.Quantity || '-') + '</td></tr>');
-                    });
-                } else {
-                    itemsBody.append('<tr><td colspan= "3" class= "text-center text-muted"> No items recorded </td></tr>');
-                }
-
-                var modal = new bootstrap.Modal(document.getElementById('viewDeliveryModal'));
-                modal.show();
-            },
-            error: function (xhr) {
-                console.error(xhr.responseText);
-                alert("Error communicating with service while loading delivery profile.");
-            }
-        });
-    }
-
-    $(document).on('click', '#btnViewToEdit', function () {
-        var modalEl = document.getElementById('viewDeliveryModal');
-        var modal = bootstrap.Modal.getInstance(modalEl);
-        if (modal) modal.hide();
-        loadDeliveryForEdit(currentViewDeliveryId);
-    })
-
-    function deleteDeliveryRecord(deliveryId) {
-        if (confirm("Are you sure you want to completely erase delivery data profile #" + deliveryId + "?")) {
+        function loadCatalogItems() {
             $.ajax({
                 type: "POST",
-                url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/DeleteDelivery") %>',
+                url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/GetAllItemsSimple") %>',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var res = response.d;
+                    if (res.success) {
+                        allCatalogItems = res.items || [];
+
+                        $('.ddlCatalogItem').each(function () {
+                            var currentCode = $(this).closest('tr').find("input[id*= 'txtItemCode']").val();
+                            $(this).html(buildCatalogOptions(currentCode));
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    console.error("Failed to load items catalog:", xhr.status, xhr.responseText);
+                }
+            });
+        }
+
+        function buildCatalogOptions(selectedCode) {
+            var options = '<option value="">-- Select Item (optional) --</option>';
+            $.each(allCatalogItems, function (i, it) {
+                var isSelected = (selectedCode && it.ItemCode === selectedCode) ? 'selected' : '';
+                options += '<option value="' + it.ItemCode + '" data-name="' + it.ItemName + '" ' + isSelected + '>' + it.ItemCode + ' - ' + it.ItemName + '</option>';
+            });
+            return options;
+        }
+
+        function loadInitialDropdowns() {
+            $.ajax({
+                type: "POST",
+                url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/GetInitialData") %>',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var res = response.d;
+
+                    if (!res.success) {
+                        showFlash(res.message || "Session expired. Please log in again.", "error");
+                        setTimeout(function () { window.location.href = "Login.aspx"; }, 1500);
+                        return;
+                    }
+
+                    populateDropdown($('#<%= ddlCustomer.ClientID %>'), res.customers, "CustomerId", "CustomerName");
+                    populateDropdown($('#<%= ddlDriver.ClientID %>'), res.drivers, "DriverId", "DriverName");
+                },
+                error: function (xhr) {
+                    console.error("Failed to load customers/drivers:", xhr.status, xhr.responseText);
+                    showFlash("Failed to load customer/driver lists. Please refresh the page.", "error");
+                }
+            });
+        }
+
+        function populateDropdown(selectEl, items, valueField, textField) {
+            var currentVal = selectEl.val();
+            selectEl.empty();
+            selectEl.append('<option value="">-- Select --</option>');
+            $.each(items, function (i, item) {
+                selectEl.append(`<option value="${item[valueField]}">${item[textField]}</option>`);
+            });
+            if (currentVal) selectEl.val(currentVal);
+        }
+
+        function initDeliveriesTable() {
+            $('#tblDeliveries').bootstrapTable('destroy').bootstrapTable({
+                cache: false,
+                method: 'post',
+                contentType: "application/json; charset=utf-8",
+                ajax: deliveryTableAjax,
+                sidePagination: 'server',
+                pagination: true,
+                pageSize: 10,
+                pageList: [10, 25, 50, 100],
+                sortName: 'DeliveryId',
+                sortOrder: 'desc',
+                search: true,
+                columns: [{
+                    field: 'DeliveryId',
+                    title: 'Delivery ID',
+                    sortable: true
+                }, {
+                    field: 'DeliveryNumber',
+                    title: 'Delivery #',
+                    sortable: true
+                }, {
+                    field: 'DeliveryDate',
+                    title: 'Date',
+                    sortable: true
+                }, {
+                    field: 'CustomerName',
+                    title: 'Customer',
+                    sortable: true
+                }, {
+                    field: 'DriverName',
+                    title: 'Driver',
+                    sortable: false
+                }, {
+                    field: 'DeliveryAddress',
+                    title: 'Address',
+                    sortable: false
+                }, {
+                    field: 'CurrentStatus',
+                    title: 'Status',
+                    sortable: true,
+                    align: 'center',
+                    halign: 'center',
+                    formatter: statusFormatter
+                }, {
+                    field: 'DeliveryId',
+                    title: 'Actions',
+                    escape: false,
+                    formatter: deliveryActionsFormatter
+                }]
+            });
+        }
+
+        function deliveryTableAjax(params) {
+            $.ajax({
+                type: "POST",
+                url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/GetDeliveriesPaged") %>',
+                data: JSON.stringify({
+                    limit: params.data.limit || 10,
+                    offset: params.data.offset || 0,
+                    sort: params.data.sort || "DeliveryId",
+                    order: params.data.order || "desc",
+                    search: params.data.search || ""
+                }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d ? response.d : response;
+                    if (typeof data === 'string') {
+                        data = JSON.parse(data);
+                    }
+                    if (Array.isArray(data)) {
+                        params.success({
+                            total: data.length,
+                            rows: data
+                        });
+                    } else {
+                        params.success({
+                            total: data.total || 0,
+                            rows: data.rows || []
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    console.error("Delivery grid load failed: ", xhr.responseText);
+                    params.error();
+                }
+            });
+        }
+
+        function statusFormatter(value, row, index) {
+            var status = value ? value.toString().trim() : "";
+            var s = status.toLowerCase().replace(/\s+/g, ' ');
+            var badgeClass = "badge-pending";
+
+            if (s === "pending") {
+                badgeClass = "badge-pending";
+            } else if (s === "out for delivery" || s === "outfordelivery") {
+                badgeClass = "badge-out";
+            } else if (s === "delivered") {
+                badgeClass = "badge-delivered";
+            } else if (s === "failed") {
+                badgeClass = "badge-failed";
+            }
+
+            return '<span class="status-pill ' + badgeClass + '">' + status + '</span>';
+        }
+
+        function deliveryActionsFormatter(value, row, index) {
+            var deliveryId = value;
+            return '<button type="button" class="btn btn-sm btn-outline-success me-1" onclick="viewDeliveryDetails(' + deliveryId + ')" title="View Details"><i class="fa-solid fa-eye"></i></button>' +
+                '<button type="button" class="btn btn-sm btn-outline-info me-1" onclick="loadDeliveryForEdit(' + deliveryId + ')" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>' +
+                '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteDeliveryRecord(' + deliveryId + ')" title="Delete"><i class="fa-solid fa-trash-can"></i></button>';
+        }
+
+        function loadDeliveryForEdit(deliveryId) {
+            $.ajax({
+                type: "POST",
+                url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/LoadDelivery") %>',
                 data: JSON.stringify({ deliveryId: deliveryId }),
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
                     var res = response.d;
-                    alert(res.message);
                     if (res.success) {
-                        $('#tblDeliveries').bootstrapTable('refresh');
+                        $('#<%= hfDeliveryId.ClientID %>').val(res.master.DeliveryId);
+                        $('#<%= txtDeliveryDate.ClientID %>').val(res.master.DeliveryDate);
+                        $('#<%= ddlCustomer.ClientID %>').val(res.master.CustomerId);
+                        $('#<%= ddlDriver.ClientID %>').val(res.master.DriverId);
+                        $('#<%= txtAddress.ClientID %>').val(res.master.DeliveryAddress);
+                        $('#<%= txtNotes.ClientID %>').val(res.master.DeliveryNotes);
+                        $('#<%= ddlStatus.ClientID %>').val(res.master.CurrentStatus);
+
+                        $('#tblItems tbody').empty();
+                        if (res.items && res.items.length > 0) {
+                            $.each(res.items, function (index, item) {
+                                addNewItemRow(item.ItemCode, item.ItemName, item.Quantity);
+                            });
+                        } else {
+                            addNewItemRow();
+                        }
+
+                        $('html, body').animate({ scrollTop: 0 }, 'fast');
+                    } else {
+                        alert("Could not load details: " + res.message);
                     }
                 },
                 error: function (xhr) {
-                    alert("Error handling request: " + xhr.responseText);
+                    console.error(xhr.responseText);
+                    alert("Error communicating with service while loading delivery profile.");
                 }
             });
         }
-    }
 
-    function saveDeliveryForm(e) {
-        if (e && e.preventDefault) { e.preventDefault(); }
+        var currentViewDeliveryId = 0;
+        function viewDeliveryDetails(deliveryId) {
+            $.ajax({
+                type: "POST",
+                url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/LoadDelivery") %>',
+                data: JSON.stringify({ deliveryId: deliveryId }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var res = response.d;
+                    if (!res.success) {
+                        alert("Could not load details : " + res.message);
+                        return;
+                    }
 
-        var deliveryId = parseInt($('#<%= hfDeliveryId.ClientID %>').val()) || 0;
-        var deliveryDate = $('#<%= txtDeliveryDate.ClientID %>').val();
-        var customerId = parseInt($('#<%= ddlCustomer.ClientID %>').val()) || 0;
-        var driverId = parseInt($('#<%= ddlDriver.ClientID %>').val()) || 0;
-        var address = $('#<%= txtAddress.ClientID %>').val();
-        var notes = $('#<%= txtNotes.ClientID %>').val();
-        var status = $('#<%= ddlStatus.ClientID %>').val();
+                    currentViewDeliveryId = deliveryId;
 
-        if (!deliveryDate || customerId === 0 || driverId === 0) {
-            alert("Please fill out all required fields (Date, Customer, and Driver).");
+                    $('#viewDeliveryNumber').text('#' + res.message);
+                    $('#viewDate').text(res.master.DeliveryDate || '-');
+                    $('#viewAddress').text(res.master.DeliveryAddress || '-');
+                    $('#viewNotes').text(res.master.DeliveryNotes || 'No notes recorded');
+                    $('#viewStatus').html(statusFormatter(res.master.CurrentStatus));
+
+                    var custOption = $('#<%= ddlCustomer.ClientID %> option[value="' + res.master.CustomerId + '"]');
+                    $('#viewCustomer').text(custOption.length ? custOption.text() : res.master.CustomerId);
+
+                    var driverOption = $('#<%= ddlDriver.ClientID %> option[value="' + res.master.DriverId + '"]');
+                    $('#viewDriver').text(driverOption.length ? driverOption.text() : res.master.DriverId);
+
+                    var itemsBody = $('#viewItemsBody');
+                    itemsBody.empty();
+                    if (res.items && res.items.length > 0) {
+                        $.each(res.items, function (index, item) {
+                            itemsBody.append('<tr><td>' + (item.ItemCode || '-') + '</td><td>' + (item.ItemName || '-') + '</td> <td>' + (item.Quantity || '-') + '</td></tr>');
+                        });
+                    } else {
+                        itemsBody.append('<tr><td colspan= "3" class= "text-center text-muted"> No items recorded </td></tr>');
+                    }
+
+                    var modal = new bootstrap.Modal(document.getElementById('viewDeliveryModal'));
+                    modal.show();
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    alert("Error communicating with service while loading delivery profile.");
+                }
+            });
+        }
+
+        $(document).on('click', '#btnViewToEdit', function () {
+            var modalEl = document.getElementById('viewDeliveryModal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+            loadDeliveryForEdit(currentViewDeliveryId);
+        })
+
+        function deleteDeliveryRecord(deliveryId) {
+            if (confirm("Are you sure you want to completely erase delivery data profile #" + deliveryId + "?")) {
+                $.ajax({
+                    type: "POST",
+                    url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/DeleteDelivery") %>',
+                    data: JSON.stringify({ deliveryId: deliveryId }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        var res = response.d;
+                        alert(res.message);
+                        if (res.success) {
+                            $('#tblDeliveries').bootstrapTable('refresh');
+                        }
+                    },
+                    error: function (xhr) {
+                        alert("Error handling request: " + xhr.responseText);
+                    }
+                });
+            }
+        }
+
+        function saveDeliveryForm(e) {
+            if (e && e.preventDefault) { e.preventDefault(); }
+
+            var deliveryId = parseInt($('#<%= hfDeliveryId.ClientID %>').val()) || 0;
+            var deliveryDate = $('#<%= txtDeliveryDate.ClientID %>').val();
+            var customerId = parseInt($('#<%= ddlCustomer.ClientID %>').val()) || 0;
+            var driverId = parseInt($('#<%= ddlDriver.ClientID %>').val()) || 0;
+            var address = $('#<%= txtAddress.ClientID %>').val();
+            var notes = $('#<%= txtNotes.ClientID %>').val();
+            var status = $('#<%= ddlStatus.ClientID %>').val();
+
+            if (!deliveryDate || customerId === 0 || driverId === 0) {
+                alert("Please fill out all required fields (Date, Customer, and Driver).");
+                return false;
+            }
+
+            var items = [];
+            $('#tblItems tbody tr').each(function () {
+                var code = $(this).find("input[id*='txtItemCode']").val();
+                var name = $(this).find("input[id*='txtItemName']").val();
+                var qty = $(this).find("input[id*='txtQuantity']").val();
+                if (code || name) {
+                    items.push({ ItemCode: code || "", ItemName: name || "", Quantity: parseInt(qty) || 1 });
+                }
+            });
+
+            var payload = {
+                deliveryId: deliveryId,
+                deliveryDate: deliveryDate,
+                customerId: customerId,
+                driverId: driverId,
+                address: address,
+                notes: notes,
+                status: status,
+                items: items
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/SaveDelivery") %>',
+                data: JSON.stringify(payload),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var res = response.d;
+
+                    if (!res.success) {
+                        showFlash(res.message, "error");
+                        return;
+                    }
+
+                    if (res.emailSent) {
+                        showFlash(res.message, "success");
+                    } else if (res.message && res.message.toLowerCase().indexOf("delivered") !== -1) {
+                        showFlash(res.message, "warning");
+                    } else {
+                        showFlash(res.message, "success");
+                    }
+
+                    resetFormFields();
+                    $('#tblDeliveries').bootstrapTable('refresh');
+                },
+                error: function (xhr) {
+                    alert("Error saving record: " + xhr.responseText);
+                }
+            });
+
             return false;
         }
 
-        var items = [];
-        $('#tblItems tbody tr').each(function () {
-            var code = $(this).find("input[id*='txtItemCode']").val();
-            var name = $(this).find("input[id*='txtItemName']").val();
-            var qty = $(this).find("input[id*='txtQuantity']").val();
-            if (code || name) {
-                items.push({ ItemCode: code || "", ItemName: name || "", Quantity: parseInt(qty) || 1 });
-            }
-        });
-
-        var payload = {
-            deliveryId: deliveryId,
-            deliveryDate: deliveryDate,
-            customerId: customerId,
-            driverId: driverId,
-            address: address,
-            notes: notes,
-            status: status,
-            items: items
-        };
-
-        $.ajax({
-            type: "POST",
-            url: '<%= ResolveUrl("~/WebServices/DeliveryService.asmx/SaveDelivery") %>',
-            data: JSON.stringify(payload),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (response) {
-                var res = response.d;
-                alert(res.message);
-                if (res.success) {
-                    resetFormFields();
-                    $('#tblDeliveries').bootstrapTable('refresh');
-                }
-            },
-            error: function (xhr) {
-                alert("Error saving record: " + xhr.responseText);
-            }
-        });
-
-        return false;
-    }
-
-    function resetFormFields() {
-        $('#<%= hfDeliveryId.ClientID %>').val('0');
-        $('#<%= txtDeliveryDate.ClientID %>').val('');
-        $('#<%= ddlCustomer.ClientID %>').val('');
-        $('#<%= ddlDriver.ClientID %>').val('');
-        $('#<%= txtAddress.ClientID %>').val('');
-        $('#<%= txtNotes.ClientID %>').val('');
-        $('#<%= ddlStatus.ClientID %>').val('Pending');
-        $('#tblItems tbody').empty();
-        addNewItemRow();
-    }
-
-    function addNewItemRow(itemCode, itemName, quantity) {
-        var codeValue = itemCode || "";
-        var nameValue = itemName || "";
-        var qtyValue = quantity || 1;
-
-        var rowHtml = `<tr>
-            <td><input type="text" id="txtItemCode" class="form-control form-control-sm" value="${codeValue}" placeholder="Code..." /></td>
-            <td><input type="text" id="txtItemName" class="form-control form-control-sm" value="${nameValue}" placeholder="Item Name..." /></td>
-            <td><input type="number" id="txtQuantity" class="form-control form-control-sm" value="${qtyValue}" min="1" /></td>
-            <td class="text-center">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeItemRow(this)">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-            </td>
-        </tr>`;
-
-        $('#tblItems tbody').append(rowHtml);
-    }
-
-    function removeItemRow(btn) {
-        $(btn).closest('tr').remove();
-        if ($('#tblItems tbody tr').length === 0) {
+        function resetFormFields() {
+            $('#<%= hfDeliveryId.ClientID %>').val('0');
+            $('#<%= txtDeliveryDate.ClientID %>').val('');
+            $('#<%= ddlCustomer.ClientID %>').val('');
+            $('#<%= ddlDriver.ClientID %>').val('');
+            $('#<%= txtAddress.ClientID %>').val('');
+            $('#<%= txtNotes.ClientID %>').val('');
+            $('#<%= ddlStatus.ClientID %>').val('Pending');
+            $('#tblItems tbody').empty();
             addNewItemRow();
         }
-    }
-</script>
+
+        function showFlash(message, type) {
+            var colors = { success: "#22c55e", warning: "#f59e0b", error: "#ef4444" };
+            var $flash = $("<div/>").html('<i class="fa-solid ' +
+                (type === "success" ? "fa-circle-check" : type === "warning" ? "fa-triangle-exclamation" : "fa-circle-xmark") +
+                ' me-2"></i>' + message).css({
+                    position: "fixed", top: "20px", right: "20px", zIndex: 9999,
+                    padding: "12px 20px", borderRadius: "8px", color: type === "success" || type === "error" ? "#fff" : "#000",
+                    backgroundColor: colors[type] || "#333", boxShadow: "0 4px 12px rgba(0,0,0,.3)",
+                    fontWeight: "600", fontSize: "0.9rem"
+                });
+            $("body").append($flash);
+            setTimeout(function () { $flash.fadeOut(400, function () { $(this).remove(); }); }, 3500);
+        }
+
+        function addNewItemRow(itemCode, itemName, quantity) {
+            var codeValue = itemCode || "";
+            var nameValue = itemName || "";
+            var qtyValue = quantity || 1;
+
+            var rowHtml = `<tr>
+        <td>
+            <select class="form-select form-select-sm ddlCatalogItem">
+                ${buildCatalogOptions(codeValue)}
+            </select>
+        </td>
+        <td><input type="text" id="txtItemCode" class="form-control form-control-sm" value="${codeValue}" placeholder="Code..." /></td>
+        <td><input type="text" id="txtItemName" class="form-control form-control-sm" value="${nameValue}" placeholder="Item Name..." /></td>
+        <td><input type="number" id="txtQuantity" class="form-control form-control-sm" value="${qtyValue}" min="1" /></td>
+        <td class="text-center">
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeItemRow(this)">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        </td>
+    </tr>`;
+
+            $('#tblItems tbody').append(rowHtml);
+        }
+
+        $(document).on('change', '.ddlCatalogItem', function () {
+            var selectedOption = $(this).find('option:selected');
+            var code = selectedOption.val();
+            var name = selectedOption.data('name');
+            var row = $(this).closest('tr');
+
+            if (code) {
+                row.find("input[id*= 'txtItemCode']").val(code);
+                row.find("input[id*= 'txtItemName']").val(name);
+            }
+        });
+
+        function removeItemRow(btn) {
+            $(btn).closest('tr').remove();
+            if ($('#tblItems tbody tr').length === 0) {
+                addNewItemRow();
+            }
+        }
+    </script>
 </body>
 </html>

@@ -41,9 +41,21 @@ namespace WebUI
                 DeliveryBLL deliveryBLL = new DeliveryBLL();
                 DataTable dt = deliveryBLL.GetFilteredDeliveriesTable(keyword, status);
 
-                rptReportsTable.DataSource = dt;
-                rptReportsTable.DataBind();
-            }catch(Exception ex)
+                if(dt != null && dt.Rows.Count > 0)
+                {
+                    rptReportsTable.DataSource = dt;
+                    rptReportsTable.DataBind();
+                    lblMessage.Visible = false;
+                }
+                else
+                {
+                    rptReportsTable.DataSource = null;
+                    rptReportsTable.DataBind();
+                    lblMessage.Text = "No deliveries found matching your selected criteria.";
+                    lblMessage.CssClass = "alert alert-warning fw-bold px-3 py-2 rounded-2 d-block";
+                    lblMessage.Visible = true;
+                }
+            } catch ( Exception ex)
             {
                 lblMessage.Text = "Error loading reports data logs: " + ex.Message;
                 lblMessage.CssClass = "alert alert-danger fw-bold px-3 py-2 rounded-2 d-block";

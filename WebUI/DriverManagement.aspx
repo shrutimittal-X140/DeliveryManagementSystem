@@ -475,6 +475,7 @@
             });
         }
 
+
         document.addEventListener("DOMContentLoaded", function () {
             var modalEl = document.getElementById('driverModal');
             if (modalEl && window.bootstrap && bootstrap.Modal) {
@@ -527,6 +528,26 @@
                     params.error();
                 }
             });
+        }
+
+        function populateItemDropdowns() {
+            $.ajax({
+                type: "POST",
+                url: "WebServices/ItemService.asmx/GetItems",
+                contentType: "application/json; charset= utf-8",
+                dataType: "json",
+                success: function (res) {
+                    if (res.d.success) {
+                        var options = '<option value= "">-- Select Item --</option>';
+                        $.each(res.d.data, function (i, item) {
+                            if (item.IsActive) {
+                                options += '<option value="' + item.ItemCode + '" data-name=' + item.ItemName + '">' + item.ItemCode + ' - ' + item.ItemName + '</option';
+                            }
+                        });
+                        $('.ddlDeliveryItemsSelect').html(options);
+                    }
+                }
+            })
         }
 
         function loadDashboardCounts()

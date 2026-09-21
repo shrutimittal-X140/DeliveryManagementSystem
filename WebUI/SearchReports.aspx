@@ -88,7 +88,7 @@
             <div class="d-flex gap-2 align-items-center flex-wrap">
                 <div class="filter-select-wrap">
                     <i class="bi bi-"></i>
-                    <asp:TextBox ID="txtKeywords" runat="server" CssClass="form-control bg-dark text-white border-secondary"></asp:TextBox>
+                    <asp:TextBox ID="txtKeywords" runat="server" CssClass="form-control bg-dark text-white border-secondary" autocomplete = "off" placeholder = "Search by Customer, Driver, Address... "></asp:TextBox>
                 </div>
                 <asp:DropDownList ID="ddlStatus" runat="server" CssClass="form-select bg-dark text-white border-secondary">
                     <asp:ListItem Value="">All Statuses</asp:ListItem>  

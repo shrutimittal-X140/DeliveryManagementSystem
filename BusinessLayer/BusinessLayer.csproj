@@ -45,7 +45,9 @@
     <Compile Include="CustomerBLL.cs" />
     <Compile Include="DeliveryBLL.cs" />
     <Compile Include="DriverBLL.cs" />
+    <Compile Include="EmailService.cs" />
     <Compile Include="EncryptionHelper.cs" />
+    <Compile Include="ItemBLL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserBLL.cs" />
   </ItemGroup>

@@ -321,9 +321,9 @@
                 data: {
                     labels: ['Total Dispatches', 'Registered Drivers', 'Active Customers'],
                     datasets: [{
-                        label: 'Total Records',
+                        label: 'Total Records', 
                         data: [totalDeliveries, totalDrivers, totalCustomers],
-                        backgroundColor: ['#22c55e', '#3b82f6', '#a855f7'],
+                        backgroundColor: ['#0ea5e9', '#22c55e', '#ef4444'],
                         borderRadius: 8,
                         barThickness: 36
                     }]
